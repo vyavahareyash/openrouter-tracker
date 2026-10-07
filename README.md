@@ -40,8 +40,13 @@ Glanceable Balance = Real-time Account Balance - Key Spend
 ### Option 1: Homebrew (Recommended)
 
 ```bash
+# Install
 brew tap vyavahareyash/tap
 brew install --cask openrouter-tracker
+
+# Update & upgrade to the latest release
+brew update
+brew upgrade --cask openrouter-tracker
 ```
 
 ### Option 2: Direct Download (DMG)

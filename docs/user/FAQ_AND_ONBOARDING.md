@@ -47,3 +47,11 @@ Yes. You can add multiple keys in the host app. Currently, the desktop widget di
 
 ### What permissions are needed?
 None beyond standard outbound HTTPS internet access. No screen recording, file access, or accessibility permissions are requested.
+
+### How do I update to the latest version?
+- **Homebrew**:
+  ```bash
+  brew update
+  brew upgrade --cask openrouter-tracker
+  ```
+- **Direct DMG**: Download the latest `.dmg` from [GitHub Releases](https://github.com/vyavahareyash/openrouter-tracker/releases/latest) and replace the application in `/Applications`.
