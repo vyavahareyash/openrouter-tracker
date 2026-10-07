@@ -36,22 +36,35 @@ Glanceable Balance = Real-time Account Balance - Key Spend
 
 ### Option 1: Homebrew (Recommended)
 
-Install directly via Homebrew (automatically bypasses browser Gatekeeper quarantine):
-
 ```bash
 brew tap vyavahareyash/tap
 brew install --cask openrouter-tracker
 ```
 
 ### Option 2: Direct Download (DMG)
-Download the latest pre-compiled Apple disk image:
 - 🍏 **macOS (Universal / Apple Silicon & Intel)**: [Download OpenRouterTracker.dmg](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.dmg)
 
-> 💡 **Gatekeeper First-Run Notice**: If downloaded through a web browser, macOS attaches quarantine attributes to unnotarized open-source binaries. If macOS blocks first launch, run:
-> ```bash
-> xattr -cr /Applications/OpenRouterTracker.app
-> ```
-> Or navigate to **System Settings > Privacy & Security** and click **Open Anyway**. Alternatively, download via terminal (`curl -LO https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.dmg`) or use Homebrew above to avoid this prompt entirely.
+---
+
+### 🛡️ First-Launch & macOS Security Prompts
+
+#### 1. Gatekeeper ("App is damaged" or "Unidentified Developer")
+Because this open-source release is ad-hoc signed rather than signed with a paid ($99/year) Apple Developer certificate, macOS Gatekeeper may intercept the first launch.
+
+You only need to allow it **once**:
+- **Quick Terminal Fix** (Recommended):
+  ```bash
+  xattr -cr /Applications/OpenRouterTracker.app
+  ```
+- **Or via Finder**: In `/Applications`, **Control-click (or Right-click)** `OpenRouterTracker.app` → select **Open** → click **Open** in the alert dialog.
+- **Or via System Settings**: Go to **System Settings > Privacy & Security**, scroll down to the Security section, and click **Open Anyway**.
+
+#### 2. macOS Keychain Access Prompt ("OpenRouter Tracker wants to use your login keychain")
+When you save an API key, macOS prompts for your login password with:
+> *"OpenRouter Tracker wants to use the 'login' keychain. Type the password for this user to allow this."*
+
+- **Why this happens**: OpenRouter Tracker never stores your raw API keys in plain text files. Instead, it delegates security to **Apple's Hardware Keychain Services (`kSecClassGenericPassword`)** with AES-256 encryption. macOS confirms your Mac user password to grant access to the secure enclave item.
+- **What to click**: Enter your Mac user password and click **"Always Allow"** so the companion app and the desktop widget can seamlessly access the key without re-prompting on every widget refresh.
 
 ### Option 3: Build From Source
 ```bash

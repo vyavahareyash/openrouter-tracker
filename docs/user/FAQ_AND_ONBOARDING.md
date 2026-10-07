@@ -18,6 +18,12 @@ Download `OpenRouterTracker.dmg` from [GitHub Releases](https://github.com/vyava
 2. In the app, click **"+ Add API Key"** in the bottom left sidebar.
 3. Paste your key (`sk-or-v1-...`) and assign a recognizable label (e.g., "Main Production").
 4. Ensure **"Show on Desktop Widget"** is toggled ON.
+5. Click **"Save Key"**.
+
+> 🔐 **Keychain Prompt**: macOS will display: *"OpenRouter Tracker wants to use your login keychain."*
+> Enter your Mac user account password and click **"Always Allow"**.
+> 
+> *Why?* Keys are never stored in unencrypted files. OpenRouter Tracker securely delegates key storage to **Apple Keychain Services** (AES-256). Choosing "Always Allow" permits the companion app and the widget extension to read the encrypted credential without prompting you on every refresh.
 
 ### Step 3: Add Widget to Desktop
 1. Right-click any open space on your macOS Desktop and click **"Edit Widgets..."**.
