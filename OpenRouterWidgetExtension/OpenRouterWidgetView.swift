@@ -20,9 +20,12 @@ struct SmallWidgetView: View {
     let payload: WidgetPayload
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(spacing: 8) {
             // Header: Nickname + Refresh Button
             HStack(spacing: 4) {
+                Circle()
+                    .fill(Color.purple)
+                    .frame(width: 6, height: 6)
                 Text(payload.customNickname)
                     .font(.system(size: 11, weight: .bold))
                     .lineLimit(1)
@@ -43,83 +46,56 @@ struct SmallWidgetView: View {
                     .lineLimit(3)
                 Spacer()
             } else {
-                Spacer(minLength: 2)
+                Spacer(minLength: 0)
 
                 if let limit = payload.keyLimit, limit > 0 {
-                    // Gauge & Remaining Block
-                    HStack(spacing: 8) {
-                        // Circular Ring Gauge
-                        ZStack {
-                            Circle()
-                                .stroke(Color.secondary.opacity(0.18), lineWidth: 4.5)
-                            Circle()
-                                .trim(from: 0, to: CGFloat(payload.usagePercent))
-                                .stroke(
-                                    payload.usagePercent > 0.9 ? Color.red : (payload.usagePercent > 0.75 ? Color.orange : Color.purple),
-                                    style: StrokeStyle(lineWidth: 4.5, lineCap: .round)
-                                )
-                                .rotationEffect(.degrees(-90))
-                            Text("\(Int(payload.usagePercent * 100))%")
-                                .font(.system(size: 8, weight: .bold, design: .rounded))
-                        }
-                        .frame(width: 34, height: 34)
+                    // Prominent Center Radial Ring Gauge
+                    ZStack {
+                        Circle()
+                            .stroke(Color.secondary.opacity(0.18), lineWidth: 7.5)
+                        Circle()
+                            .trim(from: 0, to: CGFloat(payload.usagePercent))
+                            .stroke(
+                                payload.usagePercent > 0.9 ? Color.red : (payload.usagePercent > 0.75 ? Color.orange : Color.purple),
+                                style: StrokeStyle(lineWidth: 7.5, lineCap: .round)
+                            )
+                            .rotationEffect(.degrees(-90))
 
-                        VStack(alignment: .leading, spacing: 0) {
+                        VStack(spacing: 1) {
                             Text("REMAINING")
                                 .font(.system(size: 8, weight: .bold))
                                 .foregroundStyle(.secondary)
                             Text(String(format: "$%.2f", payload.keyRemaining ?? 0.0))
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .font(.system(size: 19, weight: .bold, design: .rounded))
                                 .foregroundStyle(.green)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
+                            Text("\(Int(payload.usagePercent * 100))% USED")
+                                .font(.system(size: 8, weight: .bold, design: .rounded))
+                                .foregroundStyle(payload.usagePercent > 0.9 ? .red : (payload.usagePercent > 0.75 ? .orange : .secondary))
                         }
                     }
-
-
-
-                    Divider().opacity(0.25)
-
-                    // Bottom Stats Grid
-                    HStack {
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text("USED")
-                                .font(.system(size: 7, weight: .medium))
-                                .foregroundStyle(.secondary)
-                            Text(String(format: "$%.2f", payload.keyUsage))
-                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.75)
-                        }
-                        Spacer(minLength: 4)
-                        VStack(alignment: .trailing, spacing: 1) {
-                            Text("LIMIT")
-                                .font(.system(size: 7, weight: .medium))
-                                .foregroundStyle(.secondary)
-                            Text(String(format: "$%.2f", limit))
-                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.75)
-                        }
-                    }
+                    .frame(width: 96, height: 96)
                 } else {
                     // Unlimited Spend View
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(spacing: 4) {
+                        Image(systemName: "infinity.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(.purple)
                         Text("KEY SPEND")
                             .font(.system(size: 8, weight: .bold))
                             .foregroundStyle(.secondary)
                         Text(String(format: "$%.4f", payload.keyUsage))
-                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
                             .lineLimit(1)
                             .minimumScaleFactor(0.75)
+                        Text("Unlimited")
+                            .font(.system(size: 8))
+                            .foregroundStyle(.secondary)
                     }
-
-                    Divider().opacity(0.25)
-
-                    Text("No limit set (Unlimited)")
-                        .font(.system(size: 8))
-                        .foregroundStyle(.secondary)
                 }
+
+                Spacer(minLength: 0)
             }
         }
         .padding(10)
