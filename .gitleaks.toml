@@ -1,0 +1,30 @@
+title = "OpenRouter Tracker Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "openrouter-api-key"
+description = "Detected OpenRouter API Key"
+regex = '''sk-or-v1-[a-f0-9]{64}'''
+secretGroup = 0
+keywords = [
+    "sk-or-v1-",
+    "openrouter"
+]
+
+[allowlist]
+description = "Allow placeholders, test mocks, and doc examples"
+paths = [
+    '''Tests/.*''',
+    '''\.githooks/.*''',
+    '''docs/.*''',
+    '''README\.md''',
+    '''\.env\.example''',
+    '''Shared/MockData\.swift'''
+]
+regexes = [
+    '''sk-or-v1-test[a-zA-Z0-9_-]+''',
+    '''sk-or-v1-xxxxxxxx.*''',
+    '''sk-or-v1-\.\.\.'''
+]
