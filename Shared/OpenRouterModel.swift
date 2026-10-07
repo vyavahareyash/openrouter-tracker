@@ -118,3 +118,36 @@ public struct WidgetPayload: Codable, Equatable {
         )
     }
 }
+
+// MARK: - OpenRouter Unified Design Tokens
+import SwiftUI
+
+public struct OpenRouterTheme {
+    public static let electricBlue = Color(red: 0.23, green: 0.51, blue: 0.96) // #3B82F6
+    public static let neonViolet = Color(red: 0.66, green: 0.34, blue: 0.96)   // #A855F7
+    public static let emeraldGreen = Color(red: 0.06, green: 0.73, blue: 0.51) // #10B981
+    public static let amberWarning = Color(red: 0.96, green: 0.62, blue: 0.04) // #F59E0B
+    public static let coralRed = Color(red: 0.94, green: 0.27, blue: 0.27)     // #EF4444
+
+    public static let routerGradient = LinearGradient(
+        colors: [electricBlue, neonViolet],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    public static func gaugeStroke(usagePercent: Double) -> AnyShapeStyle {
+        if usagePercent > 0.9 {
+            return AnyShapeStyle(coralRed)
+        } else if usagePercent > 0.75 {
+            return AnyShapeStyle(amberWarning)
+        } else {
+            return AnyShapeStyle(routerGradient)
+        }
+    }
+}
+
+extension WidgetPayload {
+    public var gaugeStrokeGradient: AnyShapeStyle {
+        OpenRouterTheme.gaugeStroke(usagePercent: usagePercent)
+    }
+}

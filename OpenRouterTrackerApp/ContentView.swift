@@ -201,7 +201,7 @@ struct KeyRowView: View {
     var body: some View {
         HStack(spacing: 8) {
             Circle()
-                .fill(key.isWidgetKey ? Color.blue : Color.secondary.opacity(0.4))
+                .fill(key.isWidgetKey ? OpenRouterTheme.electricBlue : Color.secondary.opacity(0.4))
                 .frame(width: 8, height: 8)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -212,7 +212,7 @@ struct KeyRowView: View {
                     if key.isWidgetKey {
                         Image(systemName: "widget.small")
                             .font(.system(size: 10))
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(OpenRouterTheme.electricBlue)
                     }
                 }
 
@@ -226,7 +226,7 @@ struct KeyRowView: View {
             if let p = payload, let limit = p.keyLimit, limit > 0 {
                 Text("\(Int(p.usagePercent * 100))%")
                     .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundStyle(p.usagePercent > 0.9 ? .red : (p.usagePercent > 0.75 ? .orange : .purple))
+                    .foregroundStyle(p.usagePercent > 0.9 ? OpenRouterTheme.coralRed : (p.usagePercent > 0.75 ? OpenRouterTheme.amberWarning : OpenRouterTheme.neonViolet))
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(Color.secondary.opacity(0.12))
@@ -284,7 +284,7 @@ struct KeyHeaderView: View {
                     if key.isWidgetKey {
                         Label("Active on Desktop Widget", systemImage: "checkmark.seal.fill")
                             .font(.caption2.bold())
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(OpenRouterTheme.electricBlue)
                     }
                 }
             }
@@ -299,7 +299,7 @@ struct KeyHeaderView: View {
                     )
                 }
                 .buttonStyle(.bordered)
-                .tint(key.isWidgetKey ? .blue : .secondary)
+                .tint(key.isWidgetKey ? OpenRouterTheme.electricBlue : .secondary)
 
                 Button(action: onRefresh) {
                     if isRefreshing {
@@ -351,7 +351,7 @@ struct KeyBudgetSectionView: View {
                         Circle()
                             .trim(from: 0, to: CGFloat(payload.usagePercent))
                             .stroke(
-                                payload.usagePercent > 0.9 ? Color.red : (payload.usagePercent > 0.75 ? Color.orange : Color.purple),
+                                payload.gaugeStrokeGradient,
                                 style: StrokeStyle(lineWidth: 14, lineCap: .round)
                             )
                             .rotationEffect(.degrees(-90))
@@ -374,7 +374,7 @@ struct KeyBudgetSectionView: View {
                             title: "Key Spend",
                             value: String(format: "$%.4f", payload.keyUsage),
                             subtitle: "USD",
-                            color: .purple
+                            color: OpenRouterTheme.neonViolet
                         )
 
                         if let rem = payload.keyRemaining {
@@ -382,7 +382,7 @@ struct KeyBudgetSectionView: View {
                                 title: "Remaining Budget",
                                 value: String(format: "$%.4f", rem),
                                 subtitle: "USD",
-                                color: .green
+                                color: OpenRouterTheme.emeraldGreen
                             )
                         }
 
@@ -390,7 +390,7 @@ struct KeyBudgetSectionView: View {
                             title: "Assigned Limit",
                             value: payload.keyLimit != nil ? String(format: "$%.2f", payload.keyLimit!) : "Unlimited",
                             subtitle: "USD",
-                            color: .orange
+                            color: OpenRouterTheme.amberWarning
                         )
                     }
 
@@ -429,7 +429,7 @@ struct AccountOverviewSectionView: View {
                             .foregroundStyle(.secondary)
                         Text(String(format: "$%.2f", payload.totalBalance))
                             .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(OpenRouterTheme.electricBlue)
                     }
 
                     Spacer()
@@ -459,7 +459,7 @@ struct AccountOverviewSectionView: View {
                             Capsule()
                                 .fill(Color.secondary.opacity(0.15))
                             Capsule()
-                                .fill(Color.blue)
+                                .fill(OpenRouterTheme.electricBlue)
                                 .frame(width: geo.size.width * CGFloat(payload.accountBurnPercent))
                         }
                     }
@@ -477,10 +477,10 @@ struct AccountOverviewSectionView: View {
                 }
             }
             .padding(16)
-            .background(Color.blue.opacity(0.06))
+            .background(OpenRouterTheme.electricBlue.opacity(0.06))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.blue.opacity(0.18), lineWidth: 1)
+                    .stroke(OpenRouterTheme.electricBlue.opacity(0.18), lineWidth: 1)
             )
             .cornerRadius(12)
         }

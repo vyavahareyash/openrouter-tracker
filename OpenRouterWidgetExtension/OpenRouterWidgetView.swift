@@ -30,28 +30,6 @@ struct TactileRefreshButton: View {
     }
 }
 
-// MARK: - Shared Gauge Stroke Style & Theme
-extension WidgetPayload {
-    var gaugeStrokeGradient: AnyShapeStyle {
-        if usagePercent > 0.9 {
-            return AnyShapeStyle(Color.red)
-        } else if usagePercent > 0.75 {
-            return AnyShapeStyle(Color.orange)
-        } else {
-            return AnyShapeStyle(
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.23, green: 0.51, blue: 0.96), // Electric Cyan-Blue
-                        Color(red: 0.66, green: 0.34, blue: 0.96)  // Neon Violet
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-        }
-    }
-}
-
 // MARK: - Small Widget View (Square)
 struct SmallWidgetView: View {
     let payload: WidgetPayload
@@ -61,7 +39,7 @@ struct SmallWidgetView: View {
             // Header: Nickname + Refresh Button
             HStack(spacing: 4) {
                 Circle()
-                    .fill(Color(red: 0.66, green: 0.34, blue: 0.96))
+                    .fill(OpenRouterTheme.neonViolet)
                     .frame(width: 6, height: 6)
                 Text(payload.customNickname)
                     .font(.system(size: 11, weight: .bold))
