@@ -48,23 +48,17 @@ echo "✍️  [3/6] Signing app and widget extension..."
 codesign --force --sign - --entitlements OpenRouterWidgetExtension/OpenRouterWidget.entitlements "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex"
 codesign --force --sign - --entitlements OpenRouterTrackerApp/OpenRouterTracker.entitlements "$APP_DST"
 
-echo "💿 [4/6] Creating shareable DMG installer..."
-rm -rf build/dmg_staging build/OpenRouterTracker.dmg
-mkdir -p build/dmg_staging
-cp -R "$APP_DST" build/dmg_staging/
-ln -s /Applications build/dmg_staging/Applications
-if [ -f "OpenRouterTrackerApp/AppIcon.icns" ]; then
-    cp "OpenRouterTrackerApp/AppIcon.icns" "build/dmg_staging/.VolumeIcon.icns"
-fi
-hdiutil create -volname "OpenRouter Tracker" -srcfolder build/dmg_staging -ov -format UDZO build/OpenRouterTracker.dmg > /dev/null
-rm -rf build/dmg_staging
+echo "💿 [4/6] Creating customized shareable DMG installer..."
+bash scripts/create_dmg.sh "$APP_DST" "build/OpenRouterTracker.dmg" "OpenRouter Tracker"
 
-echo "📦 [5/6] Creating shareable PKG installer..."
-rm -rf build/pkg_root build/OpenRouterTracker.pkg
+echo "📦 [5/6] Creating shareable PKG & ZIP installers..."
+rm -rf build/pkg_root build/OpenRouterTracker.pkg build/OpenRouterTracker.zip
 mkdir -p build/pkg_root
 cp -R "$APP_DST" build/pkg_root/
 pkgbuild --root build/pkg_root --identifier com.openrouter.tracker --version 1.0 --install-location /Applications build/OpenRouterTracker.pkg > /dev/null 2>&1
 rm -rf build/pkg_root
+ditto -c -k --keepParent "$APP_DST" build/OpenRouterTracker.zip
+
 
 if [ "$INSTALL_MODE" = true ]; then
     echo "🚀 [6/6] Installing to /Applications and enabling widget..."

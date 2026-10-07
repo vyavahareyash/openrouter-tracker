@@ -2,6 +2,9 @@
 
 Native macOS Desktop Widget (macOS 14 Sonoma+) to track OpenRouter account balance, key usage, and credit limits with an interactive 1-click `🔄 Refresh` button.
 
+## Motivation
+Org-provided API keys often lack access to the OpenRouter web dashboard to track credits and usage. Rather than running manual CLI scripts, this app and native macOS desktop widget provide instant, interactive glanceability directly on your desktop.
+
 ## Features
 - **Native macOS Widget**: Sits directly on your Mac desktop via the official **"Edit Widgets..."** gallery.
 - **Zero Background Resource Usage**: macOS system daemon (`chronod`) renders and schedules the widget; no continuous scripts or processes required.
