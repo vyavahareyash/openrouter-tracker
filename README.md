@@ -38,3 +38,10 @@ You can also open the project directly in Xcode:
 ```bash
 open OpenRouterTracker.xcodeproj
 ```
+
+## Documentation
+- [Domain Glossary](GLOSSARY.md): Ubiquitous language, OpenRouter metrics, and system definitions.
+- [Architecture & Deep Modules](docs/architecture.md): Module catalog, seams, interfaces, and invariants.
+- [ADR 0001: Container-Based Shared Storage](docs/adr/0001-app-group-shared-storage.md): App ↔ Widget cross-process persistence design.
+- [ADR 0002: AppIntents Interactive Refresh](docs/adr/0002-app-intents-interactive-refresh.md): Zero-daemon refresh mechanism.
+- [Agent Guidelines](AGENTS.md): Local issue tracker conventions & skills layout.

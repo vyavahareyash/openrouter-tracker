@@ -8,3 +8,6 @@ DerivedData/
 *.xcuserstate
 xcuserdata/
 *.xcscmblueprint
+
+# Local agent scratch & issues
+.scratch/
