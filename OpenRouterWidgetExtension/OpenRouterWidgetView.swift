@@ -15,21 +15,22 @@ struct OpenRouterWidgetEntryView: View {
     }
 }
 
-// MARK: - Small Widget View
+// MARK: - Small Widget View (Square)
 struct SmallWidgetView: View {
     let payload: WidgetPayload
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // Header: Nickname + Refresh
-            HStack {
+        VStack(alignment: .leading, spacing: 5) {
+            // Header: Nickname + Refresh Button
+            HStack(spacing: 4) {
                 Text(payload.customNickname)
                     .font(.system(size: 11, weight: .bold))
                     .lineLimit(1)
-                Spacer()
+                    .truncationMode(.tail)
+                Spacer(minLength: 2)
                 Button(intent: RefreshBalanceIntent()) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                 }
                 .buttonStyle(.plain)
             }
@@ -37,74 +38,108 @@ struct SmallWidgetView: View {
             if let err = payload.errorMessage {
                 Spacer()
                 Text("⚠️ \(err)")
-                    .font(.system(size: 10))
+                    .font(.system(size: 9))
                     .foregroundStyle(.red)
                     .lineLimit(3)
                 Spacer()
             } else {
-                Spacer()
-                // Visual Budget Progress
+                Spacer(minLength: 2)
+
                 if let limit = payload.keyLimit, limit > 0 {
-                    HStack(spacing: 10) {
+                    // Gauge & Remaining Block
+                    HStack(spacing: 8) {
                         // Circular Ring Gauge
                         ZStack {
                             Circle()
-                                .stroke(Color.secondary.opacity(0.2), lineWidth: 5)
+                                .stroke(Color.secondary.opacity(0.18), lineWidth: 4.5)
                             Circle()
                                 .trim(from: 0, to: CGFloat(payload.usagePercent))
                                 .stroke(
                                     payload.usagePercent > 0.9 ? Color.red : (payload.usagePercent > 0.75 ? Color.orange : Color.purple),
-                                    style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                                    style: StrokeStyle(lineWidth: 4.5, lineCap: .round)
                                 )
                                 .rotationEffect(.degrees(-90))
                             Text("\(Int(payload.usagePercent * 100))%")
-                                .font(.system(size: 9, weight: .bold))
+                                .font(.system(size: 8, weight: .bold, design: .rounded))
                         }
-                        .frame(width: 38, height: 38)
+                        .frame(width: 34, height: 34)
 
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text("Key Remaining")
-                                .font(.system(size: 9))
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("REMAINING")
+                                .font(.system(size: 8, weight: .bold))
                                 .foregroundStyle(.secondary)
                             Text(String(format: "$%.2f", payload.keyRemaining ?? 0.0))
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundStyle(.green)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                    }
+
+                    // Progress Bar
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.secondary.opacity(0.15))
+                            Capsule()
+                                .fill(payload.usagePercent > 0.9 ? Color.red : Color.purple)
+                                .frame(width: max(4, geo.size.width * CGFloat(payload.usagePercent)))
+                        }
+                    }
+                    .frame(height: 4)
+
+                    Divider().opacity(0.25)
+
+                    // Bottom Stats Grid
+                    HStack {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("USED")
+                                .font(.system(size: 7, weight: .medium))
+                                .foregroundStyle(.secondary)
+                            Text(String(format: "$%.2f", payload.keyUsage))
+                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                        }
+                        Spacer(minLength: 4)
+                        VStack(alignment: .trailing, spacing: 1) {
+                            Text("LIMIT")
+                                .font(.system(size: 7, weight: .medium))
+                                .foregroundStyle(.secondary)
+                            Text(String(format: "$%.2f", limit))
+                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
                         }
                     }
                 } else {
+                    // Unlimited Spend View
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Key Used (Unlimited)")
-                            .font(.system(size: 9))
+                        Text("KEY SPEND")
+                            .font(.system(size: 8, weight: .bold))
                             .foregroundStyle(.secondary)
                         Text(String(format: "$%.4f", payload.keyUsage))
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
                     }
-                }
 
-                Divider().opacity(0.3)
+                    Divider().opacity(0.25)
 
-                // Sub-stats
-                HStack {
-                    Text("Used: $\(String(format: "%.2f", payload.keyUsage))")
-                        .font(.system(size: 9))
+                    Text("No limit set (Unlimited)")
+                        .font(.system(size: 8))
                         .foregroundStyle(.secondary)
-                    Spacer()
-                    if let lim = payload.keyLimit {
-                        Text("Cap: $\(String(format: "%.2f", lim))")
-                            .font(.system(size: 9))
-                            .foregroundStyle(.secondary)
-                    }
                 }
             }
         }
-        .padding(12)
+        .padding(10)
         .containerBackground(for: .widget) {
             Color(nsColor: .windowBackgroundColor)
         }
     }
 }
 
-// MARK: - Medium Widget View
+// MARK: - Medium Widget View (Rectangular)
 struct MediumWidgetView: View {
     let payload: WidgetPayload
 
@@ -124,6 +159,7 @@ struct MediumWidgetView: View {
                 Text(payload.keyMasked)
                     .font(.system(size: 9, design: .monospaced))
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
 
                 Spacer()
 
@@ -146,12 +182,14 @@ struct MediumWidgetView: View {
                         .frame(width: 42, height: 42)
 
                         VStack(alignment: .leading, spacing: 1) {
-                            Text("Key Remaining")
+                            Text("Remaining")
                                 .font(.system(size: 9))
                                 .foregroundStyle(.secondary)
                             Text(String(format: "$%.2f", payload.keyRemaining ?? 0.0))
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundStyle(.green)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
                         }
                     }
 
@@ -173,6 +211,8 @@ struct MediumWidgetView: View {
                             .foregroundStyle(.secondary)
                         Text(String(format: "$%.4f", payload.keyUsage))
                             .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
 
@@ -180,11 +220,15 @@ struct MediumWidgetView: View {
                     Text("Used: $\(String(format: "%.2f", payload.keyUsage))")
                         .font(.system(size: 9))
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     Spacer()
                     if let lim = payload.keyLimit {
                         Text("Limit: $\(String(format: "%.2f", lim))")
                             .font(.system(size: 9))
                             .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
             }
@@ -214,6 +258,8 @@ struct MediumWidgetView: View {
                     Text(String(format: "$%.2f", payload.totalBalance))
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(.blue)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
 
                 // Account burn gauge
@@ -233,10 +279,12 @@ struct MediumWidgetView: View {
                         Text("Used $\(String(format: "%.0f", payload.totalUsage))")
                             .font(.system(size: 8))
                             .foregroundStyle(.secondary)
+                            .lineLimit(1)
                         Spacer()
                         Text("Total $\(String(format: "%.0f", payload.totalCredits))")
                             .font(.system(size: 8))
                             .foregroundStyle(.secondary)
+                            .lineLimit(1)
                     }
                 }
 
