@@ -1,7 +1,7 @@
 import Cocoa
 
 let width: CGFloat = 1200
-let height: CGFloat = 460
+let height: CGFloat = 280
 let scale: CGFloat = 2.0 // Retina
 
 let imgSize = NSSize(width: width, height: height)
@@ -52,13 +52,13 @@ func drawGlow(at center: CGPoint, color: NSColor, radius: CGFloat) {
     }
 }
 
-drawGlow(at: CGPoint(x: 240, y: 260), color: NSColor(calibratedRed: 0.25, green: 0.50, blue: 1.0, alpha: 1.0), radius: 260)
-drawGlow(at: CGPoint(x: 950, y: 220), color: NSColor(calibratedRed: 0.0, green: 0.85, blue: 0.80, alpha: 1.0), radius: 240)
+drawGlow(at: CGPoint(x: 240, y: 140), color: NSColor(calibratedRed: 0.25, green: 0.50, blue: 1.0, alpha: 1.0), radius: 240)
+drawGlow(at: CGPoint(x: 950, y: 140), color: NSColor(calibratedRed: 0.0, green: 0.85, blue: 0.80, alpha: 1.0), radius: 240)
 
 // 3. Draw App Icon on left if available
 let iconPath = "OpenRouterTrackerApp/AppIcon.png"
 if let iconImage = NSImage(contentsOfFile: iconPath) {
-    let iconRect = CGRect(x: 80, y: height - 190, width: 110, height: 110)
+    let iconRect = CGRect(x: 80, y: height - 175, width: 110, height: 110)
     
     // Subtle shadow behind icon
     cgContext.saveGState()
@@ -74,14 +74,14 @@ let titleAttrs: [NSAttributedString.Key: Any] = [
     .font: titleFont,
     .foregroundColor: NSColor.white
 ]
-(title as NSString).draw(at: CGPoint(x: 215, y: height - 135), withAttributes: titleAttrs)
+(title as NSString).draw(at: CGPoint(x: 215, y: height - 122), withAttributes: titleAttrs)
 
 let tagText = "NATIVE MACOS DESKTOP WIDGET"
 let tagAttrs: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 13, weight: .bold),
     .foregroundColor: NSColor(calibratedRed: 0.35, green: 0.75, blue: 1.0, alpha: 1.0)
 ]
-(tagText as NSString).draw(at: CGPoint(x: 218, y: height - 85), withAttributes: tagAttrs)
+(tagText as NSString).draw(at: CGPoint(x: 218, y: height - 72), withAttributes: tagAttrs)
 
 let subtitle = "Real-time balance, credit usage & rate limits on your Mac Desktop with 1-click refresh."
 let subFont = NSFont.systemFont(ofSize: 17, weight: .medium)
@@ -89,7 +89,7 @@ let subAttrs: [NSAttributedString.Key: Any] = [
     .font: subFont,
     .foregroundColor: NSColor(calibratedWhite: 0.72, alpha: 1.0)
 ]
-(subtitle as NSString).draw(at: CGPoint(x: 218, y: height - 170), withAttributes: subAttrs)
+(subtitle as NSString).draw(at: CGPoint(x: 218, y: height - 156), withAttributes: subAttrs)
 
 // 5. Feature Badges / Pills
 let pillItems = [
@@ -100,7 +100,7 @@ let pillItems = [
 ]
 
 var pillX: CGFloat = 80
-let pillY: CGFloat = height - 250
+let pillY: CGFloat = height - 225
 let pillHeight: CGFloat = 34
 
 for (label, bgColor) in pillItems {
@@ -126,36 +126,6 @@ for (label, bgColor) in pillItems {
     
     (label as NSString).draw(at: CGPoint(x: pillX + 14, y: pillY + 8), withAttributes: textAttrs)
     pillX += pillWidth + 14
-}
-
-// 6. Draw side-by-side preview cards (Medium widget & Small widget)
-let previewWidgetMed = "screenshots/widget_medium_dark.png"
-let previewWidgetSm = "screenshots/widget_small_dark.png"
-
-if let medImg = NSImage(contentsOfFile: previewWidgetMed) {
-    let medRect = CGRect(x: 80, y: 35, width: 340, height: 145)
-    cgContext.saveGState()
-    cgContext.setShadow(offset: CGSize(width: 0, height: -4), blur: 12, color: NSColor.black.withAlphaComponent(0.4).cgColor)
-    medImg.draw(in: medRect)
-    cgContext.restoreGState()
-}
-
-if let smImg = NSImage(contentsOfFile: previewWidgetSm) {
-    let smRect = CGRect(x: 450, y: 35, width: 145, height: 145)
-    cgContext.saveGState()
-    cgContext.setShadow(offset: CGSize(width: 0, height: -4), blur: 12, color: NSColor.black.withAlphaComponent(0.4).cgColor)
-    smImg.draw(in: smRect)
-    cgContext.restoreGState()
-}
-
-// Right side preview: Host app snippet
-let previewApp = "screenshots/app_dark.png"
-if let appImg = NSImage(contentsOfFile: previewApp) {
-    let appRect = CGRect(x: 630, y: 35, width: 490, height: 155)
-    cgContext.saveGState()
-    cgContext.setShadow(offset: CGSize(width: 0, height: -4), blur: 12, color: NSColor.black.withAlphaComponent(0.4).cgColor)
-    appImg.draw(in: appRect)
-    cgContext.restoreGState()
 }
 
 NSGraphicsContext.restoreGraphicsState()
