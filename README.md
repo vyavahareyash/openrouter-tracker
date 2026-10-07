@@ -79,6 +79,20 @@ cd openrouter-tracker
 open build/OpenRouterTracker.app
 ```
 
+### Option 4: Legacy Terminal Script (Windows / Linux / CLI)
+For users on Windows, Linux, or headless environments who do not want to install the macOS desktop application, use the legacy standalone terminal script:
+
+```bash
+# 1. (Optional) Configure .env from template
+cp .env.example .env       # Windows: copy .env.example .env
+
+# 2. Run script (reads .env, environment variable, or inline argument)
+python3 scripts/check_usage.py [YOUR_KEY]
+```
+- **Zero Dependencies**: Uses standard Python 3 libraries (`urllib`, `json`), with auto-fallback to `requests` and `python-dotenv` if installed.
+- **Cross-Platform**: Works identically on Windows (`python scripts\check_usage.py`), macOS, and Linux.
+- **Template Included**: Root [`.env.example`](.env.example) is ready to copy into `.env`.
+
 ---
 
 ## Key Features
