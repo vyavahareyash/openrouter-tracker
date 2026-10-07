@@ -124,86 +124,97 @@ struct MediumWidgetView: View {
         HStack(spacing: 12) {
             // LEFT COLUMN: Key-Specific Metrics (Primary)
             VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 5) {
-                    Circle()
-                        .fill(LinearGradient(
-                            colors: [Color(red: 0.23, green: 0.51, blue: 0.96), Color(red: 0.66, green: 0.34, blue: 0.96)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ))
-                        .frame(width: 7, height: 7)
-                    Text(payload.customNickname)
-                        .font(.system(size: 12, weight: .bold))
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 5) {
+                        Circle()
+                            .fill(OpenRouterTheme.routerGradient)
+                            .frame(width: 7, height: 7)
+                        Text(payload.customNickname)
+                            .font(.system(size: 11.5, weight: .bold))
+                            .lineLimit(1)
+                    }
+                    Text(payload.keyMasked)
+                        .font(.system(size: 8.5, design: .monospaced))
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
 
-                Text(payload.keyMasked)
-                    .font(.system(size: 9, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-
-                Spacer()
+                Spacer(minLength: 0)
 
                 if let limit = payload.keyLimit, limit > 0 {
-                    HStack(spacing: 10) {
-                        // Ring
+                    HStack(spacing: 12) {
+                        // Prominent Center Radial Ring Gauge (same as Small Widget)
                         ZStack {
                             Circle()
-                                .stroke(Color.secondary.opacity(0.2), lineWidth: 5.5)
+                                .stroke(Color.secondary.opacity(0.18), lineWidth: 7.0)
                             Circle()
                                 .trim(from: 0, to: CGFloat(payload.usagePercent))
                                 .stroke(
                                     payload.gaugeStrokeGradient,
-                                    style: StrokeStyle(lineWidth: 5.5, lineCap: .round)
+                                    style: StrokeStyle(lineWidth: 7.0, lineCap: .round)
                                 )
                                 .rotationEffect(.degrees(-90))
-                            Text("\(Int(payload.usagePercent * 100))%")
-                                .font(.system(size: 9, weight: .bold))
-                        }
-                        .frame(width: 42, height: 42)
 
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text("REMAINING")
-                                .font(.system(size: 8, weight: .bold))
-                                .foregroundStyle(.secondary)
-                            Text(String(format: "$%.2f", payload.keyRemaining ?? 0.0))
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
-                                .foregroundStyle(.green)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
+                            VStack(spacing: 1) {
+                                Text("REMAINING")
+                                    .font(.system(size: 7.5, weight: .bold))
+                                    .foregroundStyle(.secondary)
+                                Text(String(format: "$%.2f", payload.keyRemaining ?? 0.0))
+                                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                                    .foregroundStyle(.green)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                                Text("\(Int(payload.usagePercent * 100))% USED")
+                                    .font(.system(size: 7.5, weight: .bold, design: .rounded))
+                                    .foregroundStyle(payload.usagePercent > 0.9 ? .red : (payload.usagePercent > 0.75 ? .orange : .secondary))
+                            }
+                        }
+                        .frame(width: 88, height: 88)
+
+                        // Spend & Limit stats beside prominent gauge
+                        VStack(alignment: .leading, spacing: 10) {
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("SPENT")
+                                    .font(.system(size: 7.5, weight: .bold))
+                                    .foregroundStyle(.secondary)
+                                Text(String(format: "$%.2f", payload.keyUsage))
+                                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(OpenRouterTheme.neonViolet)
+                            }
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("LIMIT")
+                                    .font(.system(size: 7.5, weight: .bold))
+                                    .foregroundStyle(.secondary)
+                                Text(String(format: "$%.2f", limit))
+                                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(OpenRouterTheme.amberWarning)
+                            }
                         }
                     }
                 } else {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("KEY SPEND")
-                            .font(.system(size: 8, weight: .bold))
+                    // Unlimited Spend View
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "infinity.circle.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(OpenRouterTheme.neonViolet)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("KEY SPEND")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundStyle(.secondary)
+                                Text(String(format: "$%.4f", payload.keyUsage))
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                        }
+                        Text("Unlimited Tier")
+                            .font(.system(size: 8))
                             .foregroundStyle(.secondary)
-                        Text(String(format: "$%.4f", payload.keyUsage))
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
                     }
                 }
 
-                HStack {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("USED")
-                            .font(.system(size: 7, weight: .bold))
-                            .foregroundStyle(.secondary)
-                        Text(String(format: "$%.2f", payload.keyUsage))
-                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                    }
-                    Spacer()
-                    if let lim = payload.keyLimit {
-                        VStack(alignment: .trailing, spacing: 1) {
-                            Text("LIMIT")
-                                .font(.system(size: 7, weight: .bold))
-                                .foregroundStyle(.secondary)
-                            Text(String(format: "$%.2f", lim))
-                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        }
-                    }
-                }
+                Spacer(minLength: 0)
             }
 
             Divider().opacity(0.3)
