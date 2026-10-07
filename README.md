@@ -39,9 +39,8 @@ Glanceable Balance = Real-time Account Balance - Key Spend
 Install directly via Homebrew (automatically bypasses browser Gatekeeper quarantine):
 
 ```bash
-brew install --cask vyavahareyash/tap/openrouter-tracker
-# Or install directly from URL/repo:
-brew install --cask https://raw.githubusercontent.com/vyavahareyash/openrouter-tracker/main/Casks/openrouter-tracker.rb
+brew tap vyavahareyash/tap
+brew install --cask openrouter-tracker
 ```
 
 ### Option 2: Direct Download (DMG)

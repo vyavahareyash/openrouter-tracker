@@ -12,6 +12,8 @@ cask "openrouter-tracker" do
   app "OpenRouterTracker.app"
 
   postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-cr", "#{appdir}/OpenRouterTracker.app"]
     system_command "/usr/bin/pluginkit",
                    args: ["-a", "#{appdir}/OpenRouterTracker.app/Contents/PlugIns/OpenRouterWidgetExtension.appex"]
     system_command "/usr/bin/pluginkit",
