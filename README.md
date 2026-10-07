@@ -10,7 +10,7 @@
 [![Background](https://img.shields.io/badge/Daemon-Zero_Background_Tasks-success)](#zero-background-resource-usage)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25_On--Device-7C3AED)](PRIVACY_POLICY.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/Download-Latest_DMG-06B6D4?logo=apple)](https://github.com/vyavahareyash/OpenRouterWidget/releases/latest)
+[![Release](https://img.shields.io/badge/Download-Latest_DMG-06B6D4?logo=apple)](https://github.com/vyavahareyash/openrouter-tracker/releases/latest)
 
 OpenRouter Tracker is a native macOS desktop widget and companion app designed for developers, engineering teams, and autonomous AI agents. It gives you instant glanceability over your OpenRouter credit balances, usage pacing, and rate limits directly on your desktop—with **zero background battery drain** and an **interactive 1-click refresh button**.
 
@@ -34,21 +34,31 @@ Glanceable Balance = Real-time Account Balance - Key Spend
 
 ## Downloads & Installation
 
-### Option 1: Direct Download (Recommended)
-Download the latest pre-compiled Apple disk image:
-- 🍏 **macOS (Universal / Apple Silicon & Intel)**: [Download OpenRouterTracker.dmg](https://github.com/vyavahareyash/OpenRouterWidget/releases/latest/download/OpenRouterTracker.dmg)
+### Option 1: Homebrew (Recommended)
 
-> 💡 **Gatekeeper First-Run Notice**: Open-source releases are ad-hoc signed. If macOS displays an unidentified developer warning, run:
+Install directly via Homebrew (automatically bypasses browser Gatekeeper quarantine):
+
+```bash
+brew install --cask vyavahareyash/tap/openrouter-tracker
+# Or install directly from URL/repo:
+brew install --cask https://raw.githubusercontent.com/vyavahareyash/openrouter-tracker/main/Casks/openrouter-tracker.rb
+```
+
+### Option 2: Direct Download (DMG)
+Download the latest pre-compiled Apple disk image:
+- 🍏 **macOS (Universal / Apple Silicon & Intel)**: [Download OpenRouterTracker.dmg](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.dmg)
+
+> 💡 **Gatekeeper First-Run Notice**: If downloaded through a web browser, macOS attaches quarantine attributes to unnotarized open-source binaries. If macOS blocks first launch, run:
 > ```bash
 > xattr -cr /Applications/OpenRouterTracker.app
 > ```
-> Or navigate to **System Settings > Privacy & Security** and click **Open Anyway**.
+> Or navigate to **System Settings > Privacy & Security** and click **Open Anyway**. Alternatively, download via terminal (`curl -LO https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.dmg`) or use Homebrew above to avoid this prompt entirely.
 
-### Option 2: Build From Source
+### Option 3: Build From Source
 ```bash
 # Clone the repository
-git clone https://github.com/vyavahareyash/OpenRouterWidget.git
-cd OpenRouterWidget
+git clone https://github.com/vyavahareyash/openrouter-tracker.git
+cd openrouter-tracker
 
 # Clean build and bundle the app & widget
 ./build.sh

@@ -5,7 +5,7 @@
 ## 3-Step Quickstart
 
 ### Step 1: Install & Launch
-Download `OpenRouterTracker.dmg` from [GitHub Releases](https://github.com/vyavahareyash/OpenRouterWidget/releases/latest) (or build locally via `./build.sh`). Drag `OpenRouterTracker.app` into `/Applications` and launch it once.
+Download `OpenRouterTracker.dmg` from [GitHub Releases](https://github.com/vyavahareyash/openrouter-tracker/releases/latest) (or build locally via `./build.sh`). Drag `OpenRouterTracker.app` into `/Applications` and launch it once.
 
 > **Gatekeeper Notice**: Because this open-source build is ad-hoc signed, macOS may show a developer security prompt on first launch. If prompted, run:
 > ```bash
