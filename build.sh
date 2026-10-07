@@ -38,10 +38,12 @@ APP_DST="./build/OpenRouterTracker.app"
 rm -rf "$APP_DST"
 cp -R "$APP_SRC" "$APP_DST"
 
-# Copy AppIcon into bundle resources
+# Copy AppIcon into bundle resources for both App and Widget Extension
 mkdir -p "$APP_DST/Contents/Resources"
+mkdir -p "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex/Contents/Resources"
 if [ -f "OpenRouterTrackerApp/AppIcon.icns" ]; then
     cp "OpenRouterTrackerApp/AppIcon.icns" "$APP_DST/Contents/Resources/AppIcon.icns"
+    cp "OpenRouterTrackerApp/AppIcon.icns" "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex/Contents/Resources/AppIcon.icns"
 fi
 
 echo "✍️  [3/6] Signing app and widget extension..."

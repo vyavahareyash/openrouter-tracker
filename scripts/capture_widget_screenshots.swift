@@ -82,29 +82,29 @@ struct CaptureWidgetScreenshots {
         let payload = MockData.defaultWidgetPayload
 
         await MainActor.run {
-            // Small Dark (Canvas size = 170+32 = 202)
-            let sDark = MacOSWidgetContainer(isDark: true, width: 170, height: 170) {
+            // Small Dark (Canvas size = 158+32 = 190 x 190)
+            let sDark = MacOSWidgetContainer(isDark: true, width: 158, height: 158) {
                 SmallWidgetView(payload: payload)
             }.environment(\.colorScheme, .dark)
-            renderPNG(view: sDark, width: 202, height: 202, isDark: true, to: outDir.appendingPathComponent("widget_small_dark.png"))
+            renderPNG(view: sDark, width: 190, height: 190, isDark: true, to: outDir.appendingPathComponent("widget_small_dark.png"))
 
             // Small Light
-            let sLight = MacOSWidgetContainer(isDark: false, width: 170, height: 170) {
+            let sLight = MacOSWidgetContainer(isDark: false, width: 158, height: 158) {
                 SmallWidgetView(payload: payload)
             }.environment(\.colorScheme, .light)
-            renderPNG(view: sLight, width: 202, height: 202, isDark: false, to: outDir.appendingPathComponent("widget_small_light.png"))
+            renderPNG(view: sLight, width: 190, height: 190, isDark: false, to: outDir.appendingPathComponent("widget_small_light.png"))
 
-            // Medium Dark (Canvas size = 364+32 = 396 x 202)
-            let mDark = MacOSWidgetContainer(isDark: true, width: 364, height: 170) {
+            // Medium Dark (Canvas size = 342+32 = 374 x 176)
+            let mDark = MacOSWidgetContainer(isDark: true, width: 342, height: 144) {
                 MediumWidgetView(payload: payload)
             }.environment(\.colorScheme, .dark)
-            renderPNG(view: mDark, width: 396, height: 202, isDark: true, to: outDir.appendingPathComponent("widget_medium_dark.png"))
+            renderPNG(view: mDark, width: 374, height: 176, isDark: true, to: outDir.appendingPathComponent("widget_medium_dark.png"))
 
             // Medium Light
-            let mLight = MacOSWidgetContainer(isDark: false, width: 364, height: 170) {
+            let mLight = MacOSWidgetContainer(isDark: false, width: 342, height: 144) {
                 MediumWidgetView(payload: payload)
             }.environment(\.colorScheme, .light)
-            renderPNG(view: mLight, width: 396, height: 202, isDark: false, to: outDir.appendingPathComponent("widget_medium_light.png"))
+            renderPNG(view: mLight, width: 374, height: 176, isDark: false, to: outDir.appendingPathComponent("widget_medium_light.png"))
         }
 
         print("✨ Saved all screenshots to \(outDir.path)")

@@ -443,9 +443,11 @@ def generate_pbxproj(project_dir: Path):
 \t\t{widget_cfg_debug_id} /* Debug */ = {{
 			isa = XCBuildConfiguration;
 			buildSettings = {{
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				CODE_SIGN_ENTITLEMENTS = OpenRouterWidgetExtension/OpenRouterWidget.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenRouterWidgetExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -463,9 +465,11 @@ def generate_pbxproj(project_dir: Path):
 \t\t{widget_cfg_release_id} /* Release */ = {{
 			isa = XCBuildConfiguration;
 			buildSettings = {{
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				CODE_SIGN_ENTITLEMENTS = OpenRouterWidgetExtension/OpenRouterWidget.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenRouterWidgetExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

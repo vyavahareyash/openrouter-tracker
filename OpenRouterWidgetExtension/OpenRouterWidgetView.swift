@@ -121,20 +121,20 @@ struct MediumWidgetView: View {
     let payload: WidgetPayload
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             // LEFT COLUMN: Key-Specific Metrics (Primary)
-            VStack(alignment: .leading, spacing: 6) {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 5) {
+            VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 4) {
                         Circle()
                             .fill(OpenRouterTheme.routerGradient)
-                            .frame(width: 7, height: 7)
+                            .frame(width: 6, height: 6)
                         Text(payload.customNickname)
-                            .font(.system(size: 11.5, weight: .bold))
+                            .font(.system(size: 11, weight: .bold))
                             .lineLimit(1)
                     }
                     Text(payload.keyMasked)
-                        .font(.system(size: 8.5, design: .monospaced))
+                        .font(.system(size: 8, design: .monospaced))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
@@ -142,52 +142,56 @@ struct MediumWidgetView: View {
                 Spacer(minLength: 0)
 
                 if let limit = payload.keyLimit, limit > 0 {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 8) {
                         // Prominent Center Radial Ring Gauge (same as Small Widget)
                         ZStack {
                             Circle()
-                                .stroke(Color.secondary.opacity(0.18), lineWidth: 7.0)
+                                .stroke(Color.secondary.opacity(0.18), lineWidth: 6.0)
                             Circle()
                                 .trim(from: 0, to: CGFloat(payload.usagePercent))
                                 .stroke(
                                     payload.gaugeStrokeGradient,
-                                    style: StrokeStyle(lineWidth: 7.0, lineCap: .round)
+                                    style: StrokeStyle(lineWidth: 6.0, lineCap: .round)
                                 )
                                 .rotationEffect(.degrees(-90))
 
-                            VStack(spacing: 1) {
+                            VStack(spacing: 0.5) {
                                 Text("REMAINING")
-                                    .font(.system(size: 7.5, weight: .bold))
+                                    .font(.system(size: 6.5, weight: .bold))
                                     .foregroundStyle(.secondary)
                                 Text(String(format: "$%.2f", payload.keyRemaining ?? 0.0))
-                                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                                    .font(.system(size: 14.5, weight: .bold, design: .rounded))
                                     .foregroundStyle(payload.isCriticalBalance ? OpenRouterTheme.coralRed : (payload.isLowBalance ? OpenRouterTheme.amberWarning : OpenRouterTheme.emeraldGreen))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.7)
                                 Text("\(Int(payload.usagePercent * 100))% USED")
-                                    .font(.system(size: 7.5, weight: .bold, design: .rounded))
+                                    .font(.system(size: 6.5, weight: .bold, design: .rounded))
                                     .foregroundStyle(payload.usagePercent > 0.9 ? .red : (payload.usagePercent > 0.75 ? .orange : .secondary))
                             }
                         }
-                        .frame(width: 88, height: 88)
+                        .frame(width: 74, height: 74)
 
                         // Spend & Limit stats beside prominent gauge
-                        VStack(alignment: .leading, spacing: 10) {
-                            VStack(alignment: .leading, spacing: 1) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            VStack(alignment: .leading, spacing: 0.5) {
                                 Text("SPENT")
-                                    .font(.system(size: 7.5, weight: .bold))
+                                    .font(.system(size: 7, weight: .bold))
                                     .foregroundStyle(.secondary)
                                 Text(String(format: "$%.2f", payload.keyUsage))
-                                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                    .font(.system(size: 11.5, weight: .bold, design: .monospaced))
                                     .foregroundStyle(OpenRouterTheme.neonViolet)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                             }
-                            VStack(alignment: .leading, spacing: 1) {
+                            VStack(alignment: .leading, spacing: 0.5) {
                                 Text("LIMIT")
-                                    .font(.system(size: 7.5, weight: .bold))
+                                    .font(.system(size: 7, weight: .bold))
                                     .foregroundStyle(.secondary)
                                 Text(String(format: "$%.2f", limit))
-                                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                    .font(.system(size: 11.5, weight: .bold, design: .monospaced))
                                     .foregroundStyle(OpenRouterTheme.amberWarning)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                             }
                         }
                     }
@@ -196,20 +200,20 @@ struct MediumWidgetView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 8) {
                             Image(systemName: "infinity.circle.fill")
-                                .font(.system(size: 28))
+                                .font(.system(size: 26))
                                 .foregroundStyle(OpenRouterTheme.neonViolet)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text("KEY SPEND")
-                                    .font(.system(size: 8, weight: .bold))
+                                    .font(.system(size: 7.5, weight: .bold))
                                     .foregroundStyle(.secondary)
                                 Text(String(format: "$%.4f", payload.keyUsage))
-                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.8)
                             }
                         }
                         Text("Unlimited Tier")
-                            .font(.system(size: 8))
+                            .font(.system(size: 7.5))
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -220,23 +224,23 @@ struct MediumWidgetView: View {
             Divider().opacity(0.3)
 
             // RIGHT COLUMN: Account Overview (Separated Section)
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text("Account Total")
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.system(size: 9.5, weight: .semibold))
                         .foregroundStyle(.secondary)
                     Spacer()
                     TactileRefreshButton()
                 }
 
-                Spacer()
+                Spacer(minLength: 0)
 
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 0.5) {
                     Text("Available Balance")
-                        .font(.system(size: 9))
+                        .font(.system(size: 8.5))
                         .foregroundStyle(.secondary)
                     Text(String(format: "$%.2f", payload.totalBalance))
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(.blue)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
@@ -257,32 +261,32 @@ struct MediumWidgetView: View {
 
                     HStack {
                         Text("Used $\(String(format: "%.0f", payload.totalUsage))")
-                            .font(.system(size: 8))
+                            .font(.system(size: 7.5))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                         Spacer()
                         Text("Total $\(String(format: "%.0f", payload.totalCredits))")
-                            .font(.system(size: 8))
+                            .font(.system(size: 7.5))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
                 }
 
-                Spacer()
+                Spacer(minLength: 0)
 
                 HStack {
                     Spacer()
                     Text("Updated \(payload.lastUpdated, style: .time)")
-                        .font(.system(size: 8))
+                        .font(.system(size: 7.5))
                         .foregroundStyle(.secondary)
                 }
             }
-            .padding(8)
+            .padding(7)
             .background(Color.blue.opacity(0.06))
             .cornerRadius(8)
-            .frame(width: 140)
+            .frame(width: 122)
         }
-        .padding(12)
+        .padding(10)
         .containerBackground(for: .widget) {
             Color(nsColor: .windowBackgroundColor)
         }
