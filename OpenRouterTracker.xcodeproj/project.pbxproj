@@ -1,0 +1,428 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		34B6E2351FAA17D8326FD94F /* OpenRouterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E7C6EEBD6BF9EB16AA1E8 /* OpenRouterModel.swift */; };
+		A651FC7A3F4B2DCF1BD69662 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05A3F091715919B212185F9 /* OpenRouterService.swift */; };
+		13A545B6ECBDC6364F256BF2 /* SharedStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D933DF4382C3B7A57C879ACF /* SharedStorage.swift */; };
+		ED1F33C315B5D2513C0871D3 /* OpenRouterTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59470305D2B65BABDF12A7F9 /* OpenRouterTrackerApp.swift */; };
+		C215B70782E77058BD6034DD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6B376E3B7B56ED2D2277BB /* ContentView.swift */; };
+		DE4A8BB9E2B26D63A954B723 /* OpenRouterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E7C6EEBD6BF9EB16AA1E8 /* OpenRouterModel.swift */; };
+		93CFC1548257F043166A98DC /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05A3F091715919B212185F9 /* OpenRouterService.swift */; };
+		92655D41F1E73A4E353BEAD7 /* SharedStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D933DF4382C3B7A57C879ACF /* SharedStorage.swift */; };
+		829D922CA1F51BEBA079C653 /* OpenRouterWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E9EAAABCE2E68EE815A083 /* OpenRouterWidgetBundle.swift */; };
+		A607A9B033C591B4E9EE4CD4 /* OpenRouterWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8551DBFF1AAB417F3BE3627 /* OpenRouterWidget.swift */; };
+		DF032CD825577386DB3C63BD /* OpenRouterWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1432D6AA74E4E6E1930A29 /* OpenRouterWidgetView.swift */; };
+		30192F60542C823567512A34 /* RefreshBalanceIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF499E077BACBC4EE2C9375 /* RefreshBalanceIntent.swift */; };
+		514CFE9A4139039429D18D1B /* OpenRouterWidgetExtension.appex in PlugIns */ = {isa = PBXBuildFile; fileRef = AA12BD1150592B49108EEFF9 /* OpenRouterWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4154BFE88E35E15E35D6B1FE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5CD759D4193846E4910FD9BB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3C9C9C8EBDF3A49F1BC52040;
+			remoteInfo = OpenRouterWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		87B1EA51EEFB1F01FCE82967 /* Embed PlugIns */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				514CFE9A4139039429D18D1B /* OpenRouterWidgetExtension.appex in PlugIns */,
+			);
+			name = "Embed PlugIns";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B7FA166B3D2D812B47B67F76 /* OpenRouterTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenRouterTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA12BD1150592B49108EEFF9 /* OpenRouterWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpenRouterWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E7E7C6EEBD6BF9EB16AA1E8 /* OpenRouterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterModel.swift; sourceTree = "<group>"; };
+		E05A3F091715919B212185F9 /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
+		D933DF4382C3B7A57C879ACF /* SharedStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStorage.swift; sourceTree = "<group>"; };
+		59470305D2B65BABDF12A7F9 /* OpenRouterTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterTrackerApp.swift; sourceTree = "<group>"; };
+		5D6B376E3B7B56ED2D2277BB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C35B0A9616B6EC1CDFE3D5DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0CDF956DEFD25FEC00B82347 /* OpenRouterTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenRouterTracker.entitlements; sourceTree = "<group>"; };
+		E6E9EAAABCE2E68EE815A083 /* OpenRouterWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterWidgetBundle.swift; sourceTree = "<group>"; };
+		C8551DBFF1AAB417F3BE3627 /* OpenRouterWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterWidget.swift; sourceTree = "<group>"; };
+		EB1432D6AA74E4E6E1930A29 /* OpenRouterWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterWidgetView.swift; sourceTree = "<group>"; };
+		8CF499E077BACBC4EE2C9375 /* RefreshBalanceIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshBalanceIntent.swift; sourceTree = "<group>"; };
+		8C41F65ADE299FF83404AB74 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		46AD44754AF75CCCC747D33B /* OpenRouterWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenRouterWidget.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		97EBB5DBF026C83763511FC1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E6D8C7C9C50F2BCDFA76233 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5C999E731352905727541C3C = {
+			isa = PBXGroup;
+			children = (
+				0C9803B843F66F4C0CFDB254 /* Shared */,
+				D4BAA6CF3F4204D0B19A1276 /* OpenRouterTrackerApp */,
+				1FA6CFAD87FC9EF5D898EE50 /* OpenRouterWidgetExtension */,
+				6D159F361021D92BC3E10E55 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6D159F361021D92BC3E10E55 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B7FA166B3D2D812B47B67F76 /* OpenRouterTracker.app */,
+				AA12BD1150592B49108EEFF9 /* OpenRouterWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0C9803B843F66F4C0CFDB254 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				9E7E7C6EEBD6BF9EB16AA1E8 /* OpenRouterModel.swift */,
+				E05A3F091715919B212185F9 /* OpenRouterService.swift */,
+				D933DF4382C3B7A57C879ACF /* SharedStorage.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		D4BAA6CF3F4204D0B19A1276 /* OpenRouterTrackerApp */ = {
+			isa = PBXGroup;
+			children = (
+				59470305D2B65BABDF12A7F9 /* OpenRouterTrackerApp.swift */,
+				5D6B376E3B7B56ED2D2277BB /* ContentView.swift */,
+				C35B0A9616B6EC1CDFE3D5DE /* Info.plist */,
+				0CDF956DEFD25FEC00B82347 /* OpenRouterTracker.entitlements */,
+			);
+			path = OpenRouterTrackerApp;
+			sourceTree = "<group>";
+		};
+		1FA6CFAD87FC9EF5D898EE50 /* OpenRouterWidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				E6E9EAAABCE2E68EE815A083 /* OpenRouterWidgetBundle.swift */,
+				C8551DBFF1AAB417F3BE3627 /* OpenRouterWidget.swift */,
+				EB1432D6AA74E4E6E1930A29 /* OpenRouterWidgetView.swift */,
+				8CF499E077BACBC4EE2C9375 /* RefreshBalanceIntent.swift */,
+				8C41F65ADE299FF83404AB74 /* Info.plist */,
+				46AD44754AF75CCCC747D33B /* OpenRouterWidget.entitlements */,
+			);
+			path = OpenRouterWidgetExtension;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D6EBD9827941F194CA9BCE06 /* OpenRouterTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 92C664623A2C3744BB0DC008 /* Build configuration list for PBXNativeTarget "OpenRouterTracker" */;
+			buildPhases = (
+				6F59DCFB694E09B0C079278C /* Sources */,
+				97EBB5DBF026C83763511FC1 /* Frameworks */,
+				B67BBD2C931C971412524023 /* Resources */,
+				87B1EA51EEFB1F01FCE82967 /* Embed PlugIns */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C9890467F580E6D293FC1EB4 /* PBXTargetDependency */,
+			);
+			name = OpenRouterTracker;
+			productName = OpenRouterTracker;
+			productReference = B7FA166B3D2D812B47B67F76 /* OpenRouterTracker.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3C9C9C8EBDF3A49F1BC52040 /* OpenRouterWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F778C602C9907D45B836190A /* Build configuration list for PBXNativeTarget "OpenRouterWidgetExtension" */;
+			buildPhases = (
+				9E2F2EF190B7627D3013A1AF /* Sources */,
+				7E6D8C7C9C50F2BCDFA76233 /* Frameworks */,
+				5FF313E3C2B013D97D1A61D6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenRouterWidgetExtension;
+			productName = OpenRouterWidgetExtension;
+			productReference = AA12BD1150592B49108EEFF9 /* OpenRouterWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5CD759D4193846E4910FD9BB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					D6EBD9827941F194CA9BCE06 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					3C9C9C8EBDF3A49F1BC52040 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 25B85807D3FE42A957F613DE /* Build configuration list for PBXProject "OpenRouterTracker" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5C999E731352905727541C3C;
+			productRefGroup = 6D159F361021D92BC3E10E55 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D6EBD9827941F194CA9BCE06 /* OpenRouterTracker */,
+				3C9C9C8EBDF3A49F1BC52040 /* OpenRouterWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B67BBD2C931C971412524023 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5FF313E3C2B013D97D1A61D6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6F59DCFB694E09B0C079278C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				34B6E2351FAA17D8326FD94F /* OpenRouterModel.swift in Sources */,
+				A651FC7A3F4B2DCF1BD69662 /* OpenRouterService.swift in Sources */,
+				13A545B6ECBDC6364F256BF2 /* SharedStorage.swift in Sources */,
+				ED1F33C315B5D2513C0871D3 /* OpenRouterTrackerApp.swift in Sources */,
+				C215B70782E77058BD6034DD /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9E2F2EF190B7627D3013A1AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE4A8BB9E2B26D63A954B723 /* OpenRouterModel.swift in Sources */,
+				93CFC1548257F043166A98DC /* OpenRouterService.swift in Sources */,
+				92655D41F1E73A4E353BEAD7 /* SharedStorage.swift in Sources */,
+				829D922CA1F51BEBA079C653 /* OpenRouterWidgetBundle.swift in Sources */,
+				A607A9B033C591B4E9EE4CD4 /* OpenRouterWidget.swift in Sources */,
+				DF032CD825577386DB3C63BD /* OpenRouterWidgetView.swift in Sources */,
+				30192F60542C823567512A34 /* RefreshBalanceIntent.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C9890467F580E6D293FC1EB4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3C9C9C8EBDF3A49F1BC52040 /* OpenRouterWidgetExtension */;
+			targetProxy = 4154BFE88E35E15E35D6B1FE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4CE5125821BD02ACBB6A1E37 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		34BAE8B8D0DECA673EC74C66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		4AE4F3A483B2F11438AA4454 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = OpenRouterTrackerApp/OpenRouterTracker.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OpenRouterTrackerApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.openrouter.tracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		780E286A70DD3C2D17AF79E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = OpenRouterTrackerApp/OpenRouterTracker.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OpenRouterTrackerApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.openrouter.tracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B3CDB885961AF71E1E2384DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = OpenRouterWidgetExtension/OpenRouterWidget.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OpenRouterWidgetExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.openrouter.tracker.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D7F6967B8880A6E764CC0EAD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = OpenRouterWidgetExtension/OpenRouterWidget.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OpenRouterWidgetExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.openrouter.tracker.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		25B85807D3FE42A957F613DE /* Build configuration list for PBXProject "OpenRouterTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CE5125821BD02ACBB6A1E37 /* Debug */,
+				34BAE8B8D0DECA673EC74C66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		92C664623A2C3744BB0DC008 /* Build configuration list for PBXNativeTarget "OpenRouterTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AE4F3A483B2F11438AA4454 /* Debug */,
+				780E286A70DD3C2D17AF79E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F778C602C9907D45B836190A /* Build configuration list for PBXNativeTarget "OpenRouterWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B3CDB885961AF71E1E2384DE /* Debug */,
+				D7F6967B8880A6E764CC0EAD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 5CD759D4193846E4910FD9BB /* Project object */;
+}

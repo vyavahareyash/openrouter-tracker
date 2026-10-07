@@ -1,0 +1,10 @@
+.env
+__pycache__/
+.DS_Store
+
+# Build artifacts
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
