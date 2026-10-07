@@ -8,7 +8,10 @@ struct OpenRouterTimelineEntry: TimelineEntry {
 
 struct OpenRouterTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> OpenRouterTimelineEntry {
-        OpenRouterTimelineEntry(date: Date(), payload: .placeholder)
+        if let cached = SharedStorage.getPayload() {
+            return OpenRouterTimelineEntry(date: Date(), payload: cached)
+        }
+        return OpenRouterTimelineEntry(date: Date(), payload: .placeholder)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (OpenRouterTimelineEntry) -> Void) {
@@ -21,7 +24,13 @@ struct OpenRouterTimelineProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<OpenRouterTimelineEntry>) -> Void) {
         Task {
-            let payload = await OpenRouterService.refreshAndSave()
+            var payload = await OpenRouterService.refreshAndSave()
+
+            // If refresh errored or returned empty, check if we have a valid cached payload
+            if payload.errorMessage != nil, let cached = SharedStorage.getPayload(), cached.errorMessage == nil {
+                payload = cached
+            }
+
             let entry = OpenRouterTimelineEntry(date: Date(), payload: payload)
 
             // Auto-refresh timeline every 30 minutes
