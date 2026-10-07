@@ -37,23 +37,9 @@ public struct SharedStorage {
 
     public static func loadAllKeys() -> [TrackedKey] {
         if let data = try? Data(contentsOf: keysMetaFileURL),
-           let keys = try? JSONDecoder().decode([TrackedKey].self, from: data),
-           !keys.isEmpty {
+           let keys = try? JSONDecoder().decode([TrackedKey].self, from: data) {
             return keys
         }
-
-        // Migration: If no keys saved yet, check legacy file or .env
-        if let legacyKey = loadLegacyKey(), !legacyKey.isEmpty {
-            let initial = TrackedKey(
-                customLabel: "Primary Key",
-                apiKey: legacyKey,
-                isWidgetKey: true
-            )
-            saveRawAPIKey(legacyKey, for: initial.id)
-            saveKeysMeta([initial])
-            return [initial]
-        }
-
         return []
     }
 
@@ -124,7 +110,11 @@ public struct SharedStorage {
         let secretFile = storageDirectory.appendingPathComponent("secret_\(id.uuidString).txt")
         try? FileManager.default.removeItem(at: secretFile)
 
-        if wasWidget && !keys.isEmpty {
+        if keys.isEmpty {
+            let legacyFile = storageDirectory.appendingPathComponent(legacyKeyFileName)
+            try? FileManager.default.removeItem(at: legacyFile)
+            saveWidgetPayload(WidgetPayload.empty)
+        } else if wasWidget {
             keys[0].isWidgetKey = true
             if let newWidgetRaw = getRawAPIKey(for: keys[0].id) {
                 try? newWidgetRaw.write(
@@ -132,6 +122,9 @@ public struct SharedStorage {
                     atomically: true,
                     encoding: .utf8
                 )
+            }
+            if let p = getPayload(for: keys[0].id) {
+                saveWidgetPayload(p)
             }
         }
 
@@ -228,14 +221,5 @@ public struct SharedStorage {
             try? data.write(to: keysMetaFileURL, options: .atomic)
             try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: keysMetaFileURL.path)
         }
-    }
-
-    private static func loadLegacyKey() -> String? {
-        let legacyFile = storageDirectory.appendingPathComponent(legacyKeyFileName)
-        if let content = try? String(contentsOf: legacyFile, encoding: .utf8) {
-            let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty { return trimmed }
-        }
-        return nil
     }
 }

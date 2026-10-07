@@ -248,6 +248,8 @@ struct KeyHeaderView: View {
     let onDelete: () -> Void
     let isRefreshing: Bool
 
+    @State private var showDeleteConfirm: Bool = false
+
     var body: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 4) {
@@ -308,10 +310,16 @@ struct KeyHeaderView: View {
                 }
                 .disabled(isRefreshing)
 
-                Button(role: .destructive, action: onDelete) {
+                Button(role: .destructive, action: { showDeleteConfirm = true }) {
                     Image(systemName: "trash")
                 }
                 .tint(.red)
+                .confirmationDialog("Delete '\(key.customLabel)'?", isPresented: $showDeleteConfirm) {
+                    Button("Delete Key", role: .destructive, action: onDelete)
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("This key and its metrics will be permanently removed.")
+                }
             }
         }
         .padding(.bottom, 8)
