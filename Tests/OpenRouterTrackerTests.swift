@@ -83,6 +83,36 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(payload.accountBurnPercent, 0.0)
     }
 
+    func testWidgetPayloadLowBalanceThresholds() {
+        var payload = MockData.primaryPayload
+        payload.keyLimit = 100.0
+        payload.keyUsage = 10.0
+        payload.keyRemaining = 90.0
+        payload.totalBalance = 50.0
+        XCTAssertFalse(payload.isLowBalance)
+        XCTAssertFalse(payload.isCriticalBalance)
+
+        // Low balance by key remaining <= $5
+        payload.keyRemaining = 4.50
+        XCTAssertTrue(payload.isLowBalance)
+        XCTAssertFalse(payload.isCriticalBalance)
+
+        // Critical balance by key remaining <= $2
+        payload.keyRemaining = 1.50
+        XCTAssertTrue(payload.isLowBalance)
+        XCTAssertTrue(payload.isCriticalBalance)
+
+        // Low balance by high burn percentage >= 85%
+        payload.keyRemaining = 10.0
+        payload.keyUsage = 88.0
+        payload.keyLimit = 100.0
+        XCTAssertTrue(payload.isLowBalance)
+
+        // Critical balance by extreme burn >= 95%
+        payload.keyUsage = 96.0
+        XCTAssertTrue(payload.isCriticalBalance)
+    }
+
     func testDecodingOpenRouterKeyResponse() throws {
         let json = """
         {

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenRouter Tracker — Screenshot Gallery</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --border: #334155;
+        }
+        body.light {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --accent: #0284c7;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+        h1 {
+            font-size: 28px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .theme-toggle {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .section-title {
+            font-size: 20px;
+            margin: 32px 0 16px;
+            color: var(--accent);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .card h3 {
+            margin: 12px 0 4px;
+            font-size: 16px;
+        }
+        .card p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>⚡ OpenRouter Tracker Visual Gallery</h1>
+                <p style="margin: 4px 0 0; color: var(--text-muted);">High-resolution gallery of native macOS desktop widgets and host companion app</p>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Mode</button>
+        </header>
+
+        <div class="section-title">Desktop Widgets (systemSmall & systemMedium)</div>
+        <div class="grid">
+            <div class="card">
+                <img src="widget_small_dark.png" alt="Small Widget Dark">
+                <h3>Small Widget (Dark Mode)</h3>
+                <p>Compact balance glance with in-widget 🔄 refresh button</p>
+            </div>
+            <div class="card">
+                <img src="widget_small_light.png" alt="Small Widget Light">
+                <h3>Small Widget (Light Mode)</h3>
+                <p>Retina rendering optimized for bright macOS desktop wallpapers</p>
+            </div>
+            <div class="card">
+                <img src="widget_medium_dark.png" alt="Medium Widget Dark">
+                <h3>Medium Widget (Dark Mode)</h3>
+                <p>Detailed card showing remaining balance, burn bar, and rate limits</p>
+            </div>
+            <div class="card">
+                <img src="widget_medium_light.png" alt="Medium Widget Light">
+                <h3>Medium Widget (Light Mode)</h3>
+                <p>High-contrast breakdown with live account status</p>
+            </div>
+        </div>
+
+        <div class="section-title">Host Companion App</div>
+        <div class="grid">
+            <div class="card">
+                <img src="app_dark.png" alt="Host App Dark">
+                <h3>Companion App (Dark Mode)</h3>
+                <p>Multi-key sidebar, live metrics, and desktop widget selector</p>
+            </div>
+            <div class="card">
+                <img src="app_light.png" alt="Host App Light">
+                <h3>Companion App (Light Mode)</h3>
+                <p>Native macOS Sonoma visual design with swift concurrency</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('light');
+        }
+    </script>
+</body>
+</html>

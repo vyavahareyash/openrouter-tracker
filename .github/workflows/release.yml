@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Publish Release DMG
+    runs-on: macos-14
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -switch /Applications/Xcode_15.4.app/Contents/Developer || true
+
+      - name: Build Release Bundle
+        run: ./build.sh
+
+      - name: Package DMG
+        run: |
+          ./scripts/create_dmg.sh build/OpenRouterTracker.app build/OpenRouterTracker.dmg "OpenRouter Tracker"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/OpenRouterTracker.dmg
+          draft: false
+          prerelease: false
+          generate_release_notes: true

@@ -78,6 +78,32 @@ public struct WidgetPayload: Codable, Equatable {
         return min(1.0, max(0.0, totalUsage / totalCredits))
     }
 
+    public var isLowBalance: Bool {
+        if let remaining = keyRemaining, remaining <= 5.0 {
+            return true
+        }
+        if totalBalance <= 5.0 && totalCredits > 0 {
+            return true
+        }
+        if usagePercent >= 0.85 {
+            return true
+        }
+        return false
+    }
+
+    public var isCriticalBalance: Bool {
+        if let remaining = keyRemaining, remaining <= 2.0 {
+            return true
+        }
+        if totalBalance <= 2.0 && totalCredits > 0 {
+            return true
+        }
+        if usagePercent >= 0.95 {
+            return true
+        }
+        return false
+    }
+
     public static var placeholder: WidgetPayload {
         WidgetPayload(
             keyLabel: "sk-or-v1-...",
