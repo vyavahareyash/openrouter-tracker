@@ -7,7 +7,7 @@ cask "openrouter-tracker" do
   desc "Native macOS desktop widget & companion app for OpenRouter balance and rate limits"
   homepage "https://github.com/vyavahareyash/openrouter-tracker"
 
-  depends_on macos: ">= :sonoma"
+  depends_on macos: :sonoma
 
   app "OpenRouterTracker.app"
 
