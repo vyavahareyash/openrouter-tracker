@@ -35,14 +35,10 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_15.4.app/Contents/Developer || true
 
       - name: Run Unit Tests
-        run: |
-          xcodebuild test \
-            -project OpenRouterTracker.xcodeproj \
-            -scheme OpenRouterTracker \
-            -destination 'platform=macOS' \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO
+        run: ./scripts/run_tests.sh
+
+      - name: Generate Xcode Project
+        run: python3 generate_project.py
 
       - name: Build App & Widget Extension
         run: |
@@ -51,6 +47,7 @@ jobs:
             -scheme OpenRouterTracker \
             -configuration Release \
             -destination 'platform=macOS' \
+            -derivedDataPath ./build/DerivedData \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO

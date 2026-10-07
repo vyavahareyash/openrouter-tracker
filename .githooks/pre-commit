@@ -21,8 +21,7 @@ echo -e "${BLUE}--> 1/4 Checking for exposed secrets or API keys...${NC}"
 if command -v gitleaks >/dev/null 2>&1; then
     gitleaks protect --staged --verbose
 else
-    # Fallback regex checks on staged files (excluding tests & docs)
-    STAGED_SECRETS=$(git diff --cached --pickaxe-regex -S'sk-or-v1-[a-f0-9]{32,}' -- ':(exclude).githooks/*' ':(exclude)Tests/*' ':(exclude).gitleaks.toml' 2>/dev/null || true)
+    STAGED_SECRETS=$(git diff --cached --pickaxe-regex -S'sk-or-v1-[a-f0-9]{32,}' -- ':(exclude).githooks/*' ':(exclude)Tests/*' ':(exclude)docs/*' 2>/dev/null || true)
     if [ -n "$STAGED_SECRETS" ]; then
         echo -e "${RED}Error: Potential real OpenRouter production API key detected in staged changes!${NC}"
         echo "Please remove the secret from staged files and use .env (gitignored)."
