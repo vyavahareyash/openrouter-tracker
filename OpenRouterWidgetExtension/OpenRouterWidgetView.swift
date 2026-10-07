@@ -15,6 +15,43 @@ struct OpenRouterWidgetEntryView: View {
     }
 }
 
+// MARK: - Reusable Tactile Refresh Button
+struct TactileRefreshButton: View {
+    var body: some View {
+        Button(intent: RefreshBalanceIntent()) {
+            Image(systemName: "arrow.clockwise")
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.secondary)
+                .frame(width: 18, height: 18)
+                .background(Color.secondary.opacity(0.12))
+                .clipShape(Circle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Shared Gauge Stroke Style & Theme
+extension WidgetPayload {
+    var gaugeStrokeGradient: AnyShapeStyle {
+        if usagePercent > 0.9 {
+            return AnyShapeStyle(Color.red)
+        } else if usagePercent > 0.75 {
+            return AnyShapeStyle(Color.orange)
+        } else {
+            return AnyShapeStyle(
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.23, green: 0.51, blue: 0.96), // Electric Cyan-Blue
+                        Color(red: 0.66, green: 0.34, blue: 0.96)  // Neon Violet
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+    }
+}
+
 // MARK: - Small Widget View (Square)
 struct SmallWidgetView: View {
     let payload: WidgetPayload
@@ -24,18 +61,14 @@ struct SmallWidgetView: View {
             // Header: Nickname + Refresh Button
             HStack(spacing: 4) {
                 Circle()
-                    .fill(Color.purple)
+                    .fill(Color(red: 0.66, green: 0.34, blue: 0.96))
                     .frame(width: 6, height: 6)
                 Text(payload.customNickname)
                     .font(.system(size: 11, weight: .bold))
                     .lineLimit(1)
                     .truncationMode(.tail)
                 Spacer(minLength: 2)
-                Button(intent: RefreshBalanceIntent()) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 10, weight: .bold))
-                }
-                .buttonStyle(.plain)
+                TactileRefreshButton()
             }
 
             if let err = payload.errorMessage {
@@ -56,7 +89,7 @@ struct SmallWidgetView: View {
                         Circle()
                             .trim(from: 0, to: CGFloat(payload.usagePercent))
                             .stroke(
-                                payload.usagePercent > 0.9 ? Color.red : (payload.usagePercent > 0.75 ? Color.orange : Color.purple),
+                                payload.gaugeStrokeGradient,
                                 style: StrokeStyle(lineWidth: 7.5, lineCap: .round)
                             )
                             .rotationEffect(.degrees(-90))
@@ -81,7 +114,7 @@ struct SmallWidgetView: View {
                     VStack(spacing: 4) {
                         Image(systemName: "infinity.circle.fill")
                             .font(.system(size: 28))
-                            .foregroundStyle(.purple)
+                            .foregroundStyle(Color(red: 0.66, green: 0.34, blue: 0.96))
                         Text("KEY SPEND")
                             .font(.system(size: 8, weight: .bold))
                             .foregroundStyle(.secondary)
@@ -115,7 +148,11 @@ struct MediumWidgetView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 5) {
                     Circle()
-                        .fill(Color.purple)
+                        .fill(LinearGradient(
+                            colors: [Color(red: 0.23, green: 0.51, blue: 0.96), Color(red: 0.66, green: 0.34, blue: 0.96)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
                         .frame(width: 7, height: 7)
                     Text(payload.customNickname)
                         .font(.system(size: 12, weight: .bold))
@@ -138,7 +175,7 @@ struct MediumWidgetView: View {
                             Circle()
                                 .trim(from: 0, to: CGFloat(payload.usagePercent))
                                 .stroke(
-                                    payload.usagePercent > 0.9 ? Color.red : (payload.usagePercent > 0.75 ? Color.orange : Color.purple),
+                                    payload.gaugeStrokeGradient,
                                     style: StrokeStyle(lineWidth: 5.5, lineCap: .round)
                                 )
                                 .rotationEffect(.degrees(-90))
@@ -148,8 +185,8 @@ struct MediumWidgetView: View {
                         .frame(width: 42, height: 42)
 
                         VStack(alignment: .leading, spacing: 1) {
-                            Text("Remaining")
-                                .font(.system(size: 9))
+                            Text("REMAINING")
+                                .font(.system(size: 8, weight: .bold))
                                 .foregroundStyle(.secondary)
                             Text(String(format: "$%.2f", payload.keyRemaining ?? 0.0))
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
@@ -158,12 +195,10 @@ struct MediumWidgetView: View {
                                 .minimumScaleFactor(0.8)
                         }
                     }
-
-
                 } else {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Key Spend")
-                            .font(.system(size: 10))
+                        Text("KEY SPEND")
+                            .font(.system(size: 8, weight: .bold))
                             .foregroundStyle(.secondary)
                         Text(String(format: "$%.4f", payload.keyUsage))
                             .font(.system(size: 18, weight: .bold, design: .rounded))
@@ -173,18 +208,22 @@ struct MediumWidgetView: View {
                 }
 
                 HStack {
-                    Text("Used: $\(String(format: "%.2f", payload.keyUsage))")
-                        .font(.system(size: 9))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("USED")
+                            .font(.system(size: 7, weight: .bold))
+                            .foregroundStyle(.secondary)
+                        Text(String(format: "$%.2f", payload.keyUsage))
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    }
                     Spacer()
                     if let lim = payload.keyLimit {
-                        Text("Limit: $\(String(format: "%.2f", lim))")
-                            .font(.system(size: 9))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                        VStack(alignment: .trailing, spacing: 1) {
+                            Text("LIMIT")
+                                .font(.system(size: 7, weight: .bold))
+                                .foregroundStyle(.secondary)
+                            Text(String(format: "$%.2f", lim))
+                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        }
                     }
                 }
             }
@@ -198,11 +237,7 @@ struct MediumWidgetView: View {
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Button(intent: RefreshBalanceIntent()) {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.system(size: 10, weight: .bold))
-                    }
-                    .buttonStyle(.plain)
+                    TactileRefreshButton()
                 }
 
                 Spacer()
