@@ -5,7 +5,13 @@ public struct SharedStorage {
     private static let widgetPayloadFileName = "openrouter_payload.json"
     private static let legacyKeyFileName = "openrouter_key.txt"
 
+    public static var customStorageDirectory: URL? = nil
+
     public static var storageDirectory: URL {
+        if let custom = customStorageDirectory {
+            try? FileManager.default.createDirectory(at: custom, withIntermediateDirectories: true)
+            return custom
+        }
         let home = NSHomeDirectory()
         let targetPath: String
         if home.contains("com.openrouter.tracker.widget") {

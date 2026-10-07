@@ -5,8 +5,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 INSTALL_MODE=false
-if [[ "$1" == "--install" ]]; then
-    INSTALL_MODE=true
+RUN_TESTS=false
+for arg in "$@"; do
+    if [[ "$arg" == "--install" ]]; then
+        INSTALL_MODE=true
+    fi
+    if [[ "$arg" == "--test" ]]; then
+        RUN_TESTS=true
+    fi
+done
+
+if [ "$RUN_TESTS" = true ]; then
+    echo "🧪 Running unit tests before build..."
+    bash scripts/run_tests.sh
 fi
 
 echo "🔨 [1/6] Generating Xcode project..."

@@ -9,7 +9,8 @@ public struct OpenRouterService {
         return URLSession(configuration: config)
     }
 
-    public static func fetchData(apiKey: String, customNickname: String) async -> WidgetPayload {
+    public static func fetchData(apiKey: String, customNickname: String, session: URLSession? = nil) async -> WidgetPayload {
+        let activeSession = session ?? self.session
         let cleanKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanKey.isEmpty else {
             return WidgetPayload.empty
@@ -42,7 +43,7 @@ public struct OpenRouterService {
             keyReq.setValue("Bearer \(cleanKey)", forHTTPHeaderField: "Authorization")
             keyReq.setValue("OpenRouterTracker/2.0", forHTTPHeaderField: "User-Agent")
 
-            let (keyData, keyResp) = try await session.data(for: keyReq)
+            let (keyData, keyResp) = try await activeSession.data(for: keyReq)
             if let httpResp = keyResp as? HTTPURLResponse, httpResp.statusCode != 200 {
                 let msg = String(data: keyData, encoding: .utf8) ?? "HTTP \(httpResp.statusCode)"
                 payload.errorMessage = "Auth failed: \(msg)"
@@ -74,7 +75,7 @@ public struct OpenRouterService {
                 creditsReq.setValue("Bearer \(cleanKey)", forHTTPHeaderField: "Authorization")
                 creditsReq.setValue("OpenRouterTracker/2.0", forHTTPHeaderField: "User-Agent")
 
-                let (cData, cResp) = try await session.data(for: creditsReq)
+                let (cData, cResp) = try await activeSession.data(for: creditsReq)
                 if let httpResp = cResp as? HTTPURLResponse, httpResp.statusCode == 200 {
                     let decodedCredits = try JSONDecoder().decode(OpenRouterCreditsResponse.self, from: cData)
                     if let cd = decodedCredits.data {

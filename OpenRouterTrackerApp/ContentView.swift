@@ -3,6 +3,8 @@ import SwiftUI
 import WidgetKit
 
 struct ContentView: View {
+    var isPreview: Bool = false
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var keys: [TrackedKey] = []
     @State private var selectedKeyId: UUID?
     @State private var payloads: [UUID: WidgetPayload] = [:]
@@ -24,37 +26,50 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             // MARK: - Sidebar: Keys List
-            VStack(spacing: 0) {
-                List(selection: $selectedKeyId) {
-                    Section("Tracked Keys") {
-                        ForEach(keys) { key in
+            List {
+                Section("Tracked Keys") {
+                    ForEach(keys) { key in
+                        Button(action: { selectedKeyId = key.id }) {
                             KeyRowView(
                                 key: key,
                                 payload: payloads[key.id] ?? SharedStorage.getPayload(for: key.id),
                                 isSelected: key.id == selectedKey?.id
                             )
-                            .tag(key.id)
                         }
+                        .buttonStyle(.plain)
+                        .listRowInsets(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
+                        .listRowSeparator(.hidden)
                     }
                 }
-                .listStyle(.sidebar)
-
-                Divider()
-
-                // Add Key Button
-                Button(action: { showAddKeySheet = true }) {
-                    Label("Add API Key", systemImage: "plus.circle.fill")
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                }
-                .buttonStyle(.plain)
-                .background(Color(nsColor: .controlBackgroundColor))
             }
-            .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 300)
+            .listStyle(.sidebar)
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 8) {
+                    Divider()
+                    Button(action: { showAddKeySheet = true }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(OpenRouterTheme.electricBlue)
+                            Text("Add API Key")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(Color.primary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.secondary.opacity(0.08))
+                        .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 8)
+                }
+                .background(Color(nsColor: .windowBackgroundColor))
+            }
+            .navigationSplitViewColumnWidth(min: 240, ideal: 280, max: 340)
         } detail: {
             // MARK: - Detail: Active Key Metrics & Visuals
             if let key = selectedKey {
@@ -111,7 +126,7 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .frame(minWidth: 780, minHeight: 620)
+        .frame(minWidth: 780, minHeight: 540)
         .sheet(isPresented: $showAddKeySheet) {
             AddKeySheetView(onAdd: handleAddKey)
         }
@@ -123,6 +138,12 @@ struct ContentView: View {
     // MARK: - Actions
 
     private func loadInitialData() {
+        if isPreview {
+            keys = MockData.sampleKeys
+            selectedKeyId = MockData.primaryKeyId
+            payloads = MockData.samplePayloads
+            return
+        }
         keys = SharedStorage.loadAllKeys()
         if let widgetKey = keys.first(where: { $0.isWidgetKey }) ?? keys.first {
             selectedKeyId = widgetKey.id
@@ -194,31 +215,33 @@ struct ContentView: View {
 
 // MARK: - Sidebar Row
 struct KeyRowView: View {
+    @Environment(\.colorScheme) private var colorScheme
     let key: TrackedKey
     let payload: WidgetPayload?
     let isSelected: Bool
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Circle()
-                .fill(key.isWidgetKey ? OpenRouterTheme.electricBlue : Color.secondary.opacity(0.4))
+                .fill(key.isWidgetKey ? OpenRouterTheme.electricBlue : (isSelected ? Color.white.opacity(0.85) : (colorScheme == .dark ? Color.white.opacity(0.35) : Color.secondary.opacity(0.4))))
                 .frame(width: 8, height: 8)
 
             VStack(alignment: .leading, spacing: 2) {
-                HStack {
+                HStack(spacing: 4) {
                     Text(key.customLabel)
                         .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(isSelected ? Color.white : (colorScheme == .dark ? Color.white.opacity(0.9) : Color.primary))
                         .lineLimit(1)
                     if key.isWidgetKey {
                         Image(systemName: "widget.small")
                             .font(.system(size: 10))
-                            .foregroundStyle(OpenRouterTheme.electricBlue)
+                            .foregroundStyle(isSelected ? Color.white : OpenRouterTheme.electricBlue)
                     }
                 }
 
                 Text(key.keyMasked)
                     .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isSelected ? Color.white.opacity(0.75) : (colorScheme == .dark ? Color.white.opacity(0.55) : Color.secondary))
             }
 
             Spacer()
@@ -226,14 +249,19 @@ struct KeyRowView: View {
             if let p = payload, let limit = p.keyLimit, limit > 0 {
                 Text("\(Int(p.usagePercent * 100))%")
                     .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundStyle(p.usagePercent > 0.9 ? OpenRouterTheme.coralRed : (p.usagePercent > 0.75 ? OpenRouterTheme.amberWarning : OpenRouterTheme.neonViolet))
+                    .foregroundStyle(isSelected ? Color.white : (p.usagePercent > 0.9 ? OpenRouterTheme.coralRed : (p.usagePercent > 0.75 ? OpenRouterTheme.amberWarning : OpenRouterTheme.neonViolet)))
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.12))
+                    .background(isSelected ? Color.white.opacity(0.2) : (colorScheme == .dark ? Color.white.opacity(0.12) : Color.secondary.opacity(0.12)))
                     .cornerRadius(4)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(isSelected ? OpenRouterTheme.electricBlue : Color.clear)
+        )
     }
 }
 

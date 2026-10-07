@@ -78,8 +78,8 @@ struct CaptureWidgetScreenshots {
             exit(1)
         }
 
-        // Use real cached payload if present, otherwise showcase placeholder
-        let payload = SharedStorage.getWidgetPayload() ?? WidgetPayload.placeholder
+        // Use rich dummy data from MockData for crisp, consistent showcases
+        let payload = MockData.defaultWidgetPayload
 
         await MainActor.run {
             // Small Dark (Canvas size = 170+32 = 202)

@@ -31,6 +31,7 @@ def generate_pbxproj(project_dir: Path):
         ("OpenRouterService.swift", uid("File_OpenRouterService")),
         ("SharedStorage.swift", uid("File_SharedStorage")),
         ("KeychainHelper.swift", uid("File_KeychainHelper")),
+        ("MockData.swift", uid("File_MockData")),
     ]
 
     app_files = [

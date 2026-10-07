@@ -11,12 +11,14 @@
 		A651FC7A3F4B2DCF1BD69662 /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05A3F091715919B212185F9 /* OpenRouterService.swift */; };
 		13A545B6ECBDC6364F256BF2 /* SharedStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D933DF4382C3B7A57C879ACF /* SharedStorage.swift */; };
 		EECA1D106929207A69D37944 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D1B1AAE68C3E5C89AE608 /* KeychainHelper.swift */; };
+		DF4A67D3E977C7910D7C290E /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A708D848A3A057AE3939D3 /* MockData.swift */; };
 		ED1F33C315B5D2513C0871D3 /* OpenRouterTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59470305D2B65BABDF12A7F9 /* OpenRouterTrackerApp.swift */; };
 		C215B70782E77058BD6034DD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6B376E3B7B56ED2D2277BB /* ContentView.swift */; };
 		DE4A8BB9E2B26D63A954B723 /* OpenRouterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E7C6EEBD6BF9EB16AA1E8 /* OpenRouterModel.swift */; };
 		93CFC1548257F043166A98DC /* OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05A3F091715919B212185F9 /* OpenRouterService.swift */; };
 		92655D41F1E73A4E353BEAD7 /* SharedStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D933DF4382C3B7A57C879ACF /* SharedStorage.swift */; };
 		C3ECC811BA34A285F9E8D72F /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D1B1AAE68C3E5C89AE608 /* KeychainHelper.swift */; };
+		7A283AB361AE7467EAB8EF27 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A708D848A3A057AE3939D3 /* MockData.swift */; };
 		829D922CA1F51BEBA079C653 /* OpenRouterWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E9EAAABCE2E68EE815A083 /* OpenRouterWidgetBundle.swift */; };
 		A607A9B033C591B4E9EE4CD4 /* OpenRouterWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8551DBFF1AAB417F3BE3627 /* OpenRouterWidget.swift */; };
 		DF032CD825577386DB3C63BD /* OpenRouterWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1432D6AA74E4E6E1930A29 /* OpenRouterWidgetView.swift */; };
@@ -55,6 +57,7 @@
 		E05A3F091715919B212185F9 /* OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterService.swift; sourceTree = "<group>"; };
 		D933DF4382C3B7A57C879ACF /* SharedStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStorage.swift; sourceTree = "<group>"; };
 		E65D1B1AAE68C3E5C89AE608 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		E5A708D848A3A057AE3939D3 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
 		59470305D2B65BABDF12A7F9 /* OpenRouterTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenRouterTrackerApp.swift; sourceTree = "<group>"; };
 		5D6B376E3B7B56ED2D2277BB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C35B0A9616B6EC1CDFE3D5DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -111,6 +114,7 @@
 				E05A3F091715919B212185F9 /* OpenRouterService.swift */,
 				D933DF4382C3B7A57C879ACF /* SharedStorage.swift */,
 				E65D1B1AAE68C3E5C89AE608 /* KeychainHelper.swift */,
+				E5A708D848A3A057AE3939D3 /* MockData.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -241,6 +245,7 @@
 				A651FC7A3F4B2DCF1BD69662 /* OpenRouterService.swift in Sources */,
 				13A545B6ECBDC6364F256BF2 /* SharedStorage.swift in Sources */,
 				EECA1D106929207A69D37944 /* KeychainHelper.swift in Sources */,
+				DF4A67D3E977C7910D7C290E /* MockData.swift in Sources */,
 				ED1F33C315B5D2513C0871D3 /* OpenRouterTrackerApp.swift in Sources */,
 				C215B70782E77058BD6034DD /* ContentView.swift in Sources */,
 			);
@@ -254,6 +259,7 @@
 				93CFC1548257F043166A98DC /* OpenRouterService.swift in Sources */,
 				92655D41F1E73A4E353BEAD7 /* SharedStorage.swift in Sources */,
 				C3ECC811BA34A285F9E8D72F /* KeychainHelper.swift in Sources */,
+				7A283AB361AE7467EAB8EF27 /* MockData.swift in Sources */,
 				829D922CA1F51BEBA079C653 /* OpenRouterWidgetBundle.swift in Sources */,
 				A607A9B033C591B4E9EE4CD4 /* OpenRouterWidget.swift in Sources */,
 				DF032CD825577386DB3C63BD /* OpenRouterWidgetView.swift in Sources */,
