@@ -386,37 +386,7 @@ struct KeyBudgetSectionView: View {
                         )
                     }
 
-                    // Linear Segmented Progress Bar
-                    if let limit = payload.keyLimit, limit > 0 {
-                        VStack(alignment: .leading, spacing: 4) {
-                            GeometryReader { geo in
-                                ZStack(alignment: .leading) {
-                                    Capsule()
-                                        .fill(Color.secondary.opacity(0.15))
-                                    Capsule()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [Color.purple, payload.usagePercent > 0.9 ? Color.red : Color.purple],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .frame(width: geo.size.width * CGFloat(payload.usagePercent))
-                                }
-                            }
-                            .frame(height: 8)
 
-                            HStack {
-                                Text("$\(String(format: "%.2f", payload.keyUsage)) used")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Text("$\(String(format: "%.2f", limit)) cap")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
                 }
             }
             .padding()

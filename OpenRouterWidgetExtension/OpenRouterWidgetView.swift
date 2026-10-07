@@ -76,17 +76,7 @@ struct SmallWidgetView: View {
                         }
                     }
 
-                    // Progress Bar
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .fill(Color.secondary.opacity(0.15))
-                            Capsule()
-                                .fill(payload.usagePercent > 0.9 ? Color.red : Color.purple)
-                                .frame(width: max(4, geo.size.width * CGFloat(payload.usagePercent)))
-                        }
-                    }
-                    .frame(height: 4)
+
 
                     Divider().opacity(0.25)
 
@@ -193,17 +183,7 @@ struct MediumWidgetView: View {
                         }
                     }
 
-                    // Linear bar
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .fill(Color.secondary.opacity(0.2))
-                            Capsule()
-                                .fill(payload.usagePercent > 0.9 ? Color.red : Color.purple)
-                                .frame(width: geo.size.width * CGFloat(payload.usagePercent))
-                        }
-                    }
-                    .frame(height: 5)
+
                 } else {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Key Spend")
