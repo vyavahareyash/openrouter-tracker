@@ -55,15 +55,39 @@ func drawGlow(at center: CGPoint, color: NSColor, radius: CGFloat) {
 drawGlow(at: CGPoint(x: 240, y: 140), color: NSColor(calibratedRed: 0.25, green: 0.50, blue: 1.0, alpha: 1.0), radius: 240)
 drawGlow(at: CGPoint(x: 950, y: 140), color: NSColor(calibratedRed: 0.0, green: 0.85, blue: 0.80, alpha: 1.0), radius: 240)
 
-// 3. Draw App Icon on left if available
+// 3. Draw App Icon on left if available (macOS squircle shape)
 let iconPath = "OpenRouterTrackerApp/AppIcon.png"
 if let iconImage = NSImage(contentsOfFile: iconPath) {
     let iconRect = CGRect(x: 80, y: height - 175, width: 110, height: 110)
+    let cornerRadius: CGFloat = 24.5
+    let squirclePath = CGPath(roundedRect: iconRect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
     
-    // Subtle shadow behind icon
+    // 3a. Native macOS squircle drop shadow
     cgContext.saveGState()
-    cgContext.setShadow(offset: CGSize(width: 0, height: -6), blur: 16, color: NSColor.black.withAlphaComponent(0.4).cgColor)
+    cgContext.setShadow(
+        offset: CGSize(width: 0, height: -6),
+        blur: 16,
+        color: NSColor.black.withAlphaComponent(0.45).cgColor
+    )
+    cgContext.addPath(squirclePath)
+    cgContext.setFillColor(NSColor.black.cgColor)
+    cgContext.fillPath()
+    cgContext.restoreGState()
+    
+    // 3b. Clipped app icon
+    cgContext.saveGState()
+    cgContext.addPath(squirclePath)
+    cgContext.clip()
     iconImage.draw(in: iconRect)
+    cgContext.restoreGState()
+    
+    // 3c. Subtle macOS icon border
+    cgContext.saveGState()
+    let strokePath = CGPath(roundedRect: iconRect.insetBy(dx: 0.5, dy: 0.5), cornerWidth: cornerRadius - 0.5, cornerHeight: cornerRadius - 0.5, transform: nil)
+    cgContext.addPath(strokePath)
+    cgContext.setStrokeColor(NSColor(white: 1.0, alpha: 0.18).cgColor)
+    cgContext.setLineWidth(1.0)
+    cgContext.strokePath()
     cgContext.restoreGState()
 }
 
