@@ -38,9 +38,26 @@ APP_DST="./build/OpenRouterTracker.app"
 rm -rf "$APP_DST"
 cp -R "$APP_SRC" "$APP_DST"
 
-# Copy AppIcon into bundle resources for both App and Widget Extension
+# Compile and copy asset catalog (Assets.car) and icns for both App and Widget Extension
 mkdir -p "$APP_DST/Contents/Resources"
 mkdir -p "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex/Contents/Resources"
+mkdir -p build/actool_out
+
+if [ -d "Shared/Assets.xcassets" ]; then
+    xcrun actool Shared/Assets.xcassets \
+      --compile build/actool_out \
+      --platform macosx \
+      --minimum-deployment-target 14.0 \
+      --app-icon AppIcon \
+      --output-partial-info-plist build/actool_partial.plist \
+      --output-format human-readable-text > /dev/null 2>&1 || true
+
+    if [ -f "build/actool_out/Assets.car" ]; then
+        cp "build/actool_out/Assets.car" "$APP_DST/Contents/Resources/Assets.car"
+        cp "build/actool_out/Assets.car" "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex/Contents/Resources/Assets.car"
+    fi
+fi
+
 if [ -f "OpenRouterTrackerApp/AppIcon.icns" ]; then
     cp "OpenRouterTrackerApp/AppIcon.icns" "$APP_DST/Contents/Resources/AppIcon.icns"
     cp "OpenRouterTrackerApp/AppIcon.icns" "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex/Contents/Resources/AppIcon.icns"
