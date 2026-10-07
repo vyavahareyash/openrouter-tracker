@@ -27,6 +27,12 @@ APP_DST="./build/OpenRouterTracker.app"
 rm -rf "$APP_DST"
 cp -R "$APP_SRC" "$APP_DST"
 
+# Copy AppIcon into bundle resources
+mkdir -p "$APP_DST/Contents/Resources"
+if [ -f "OpenRouterTrackerApp/AppIcon.icns" ]; then
+    cp "OpenRouterTrackerApp/AppIcon.icns" "$APP_DST/Contents/Resources/AppIcon.icns"
+fi
+
 echo "✍️  [3/6] Signing app and widget extension..."
 codesign --force --sign - --entitlements OpenRouterWidgetExtension/OpenRouterWidget.entitlements "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex"
 codesign --force --sign - --entitlements OpenRouterTrackerApp/OpenRouterTracker.entitlements "$APP_DST"
@@ -36,6 +42,9 @@ rm -rf build/dmg_staging build/OpenRouterTracker.dmg
 mkdir -p build/dmg_staging
 cp -R "$APP_DST" build/dmg_staging/
 ln -s /Applications build/dmg_staging/Applications
+if [ -f "OpenRouterTrackerApp/AppIcon.icns" ]; then
+    cp "OpenRouterTrackerApp/AppIcon.icns" "build/dmg_staging/.VolumeIcon.icns"
+fi
 hdiutil create -volname "OpenRouter Tracker" -srcfolder build/dmg_staging -ov -format UDZO build/OpenRouterTracker.dmg > /dev/null
 rm -rf build/dmg_staging
 
@@ -55,7 +64,7 @@ if [ "$INSTALL_MODE" = true ]; then
     pluginkit -e use -i com.openrouter.tracker.widget
     /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R -trusted /Applications/OpenRouterTracker.app
     killall NotificationCenter chronod 2>/dev/null || true
-    echo "✅ Successfully installed, enabled widget plugin, and refreshed daemons!"
+    echo "✅ Successfully installed with custom app icon and refreshed daemons!"
 else
     echo "🚀 [6/6] Registering build with macOS LaunchServices..."
     /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R -trusted "$APP_DST"
@@ -63,3 +72,7 @@ fi
 
 echo ""
 echo "✨ Build Complete!"
+echo "Shareable Installers with Custom App Icon:"
+echo "  - DMG: $(pwd)/build/OpenRouterTracker.dmg"
+echo "  - PKG: $(pwd)/build/OpenRouterTracker.pkg"
+echo "  - ZIP: $(pwd)/build/OpenRouterTracker.zip"
