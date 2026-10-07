@@ -8,14 +8,14 @@ struct OpenRouterTimelineEntry: TimelineEntry {
 
 struct OpenRouterTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> OpenRouterTimelineEntry {
-        if let cached = SharedStorage.getPayload() {
+        if let cached = SharedStorage.getWidgetPayload() {
             return OpenRouterTimelineEntry(date: Date(), payload: cached)
         }
         return OpenRouterTimelineEntry(date: Date(), payload: .placeholder)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (OpenRouterTimelineEntry) -> Void) {
-        if let cached = SharedStorage.getPayload() {
+        if let cached = SharedStorage.getWidgetPayload() {
             completion(OpenRouterTimelineEntry(date: Date(), payload: cached))
         } else {
             completion(OpenRouterTimelineEntry(date: Date(), payload: .placeholder))
@@ -24,16 +24,13 @@ struct OpenRouterTimelineProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<OpenRouterTimelineEntry>) -> Void) {
         Task {
-            var payload = await OpenRouterService.refreshAndSave()
+            var payload = await OpenRouterService.refreshWidgetKey()
 
-            // If refresh errored or returned empty, check if we have a valid cached payload
-            if payload.errorMessage != nil, let cached = SharedStorage.getPayload(), cached.errorMessage == nil {
+            if payload.errorMessage != nil, let cached = SharedStorage.getWidgetPayload(), cached.errorMessage == nil {
                 payload = cached
             }
 
             let entry = OpenRouterTimelineEntry(date: Date(), payload: payload)
-
-            // Auto-refresh timeline every 30 minutes
             let nextRefresh = Calendar.current.date(byAdding: .minute, value: 30, to: Date()) ?? Date().addingTimeInterval(1800)
             let timeline = Timeline(entries: [entry], policy: .after(nextRefresh))
             completion(timeline)
@@ -49,7 +46,7 @@ struct OpenRouterWidget: Widget {
             OpenRouterWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("OpenRouter Balance")
-        .description("Track OpenRouter balance, key usage, and credit limits with 1-click refresh.")
+        .description("Track key budget, remaining credits, and account totals with 1-click refresh.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

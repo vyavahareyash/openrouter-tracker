@@ -9,7 +9,7 @@ public struct RefreshBalanceIntent: AppIntent {
     public init() {}
 
     public func perform() async throws -> some IntentResult {
-        await OpenRouterService.refreshAndSave()
+        await OpenRouterService.refreshWidgetKey()
         WidgetCenter.shared.reloadAllTimelines()
         return .result()
     }

@@ -30,6 +30,7 @@ def generate_pbxproj(project_dir: Path):
         ("OpenRouterModel.swift", uid("File_OpenRouterModel")),
         ("OpenRouterService.swift", uid("File_OpenRouterService")),
         ("SharedStorage.swift", uid("File_SharedStorage")),
+        ("KeychainHelper.swift", uid("File_KeychainHelper")),
     ]
 
     app_files = [
@@ -50,7 +51,6 @@ def generate_pbxproj(project_dir: Path):
 
     # Build files (Sources)
     app_build_sources = []
-    # App compiles shared_files and app Swift files
     for name, fid in shared_files:
         bfid = uid(f"AppBuild_{name}")
         app_build_sources.append((fid, bfid, name))
@@ -60,7 +60,6 @@ def generate_pbxproj(project_dir: Path):
             app_build_sources.append((fid, bfid, name))
 
     widget_build_sources = []
-    # Widget compiles shared_files and widget Swift files
     for name, fid in shared_files:
         bfid = uid(f"WidgetBuild_{name}")
         widget_build_sources.append((fid, bfid, name))
