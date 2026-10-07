@@ -5,6 +5,7 @@
 # OpenRouter Tracker
 
 [![macOS](https://img.shields.io/badge/macOS-14_Sonoma+-000000?logo=apple&logoColor=white)](https://apple.com/macos)
+[![Windows / CLI](https://img.shields.io/badge/Windows%20%2F%20CLI-Legacy_Script-3776AB?logo=python&logoColor=white)](#windows-method)
 [![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
 [![Framework](https://img.shields.io/badge/UI-SwiftUI_%26_WidgetKit-0A84FF)](https://developer.apple.com/xcode/swiftui/)
 [![Background](https://img.shields.io/badge/Daemon-Zero_Background_Tasks-success)](#zero-background-resource-usage)
@@ -34,6 +35,8 @@ Glanceable Balance = Real-time Account Balance - Key Spend
 
 ## Downloads & Installation
 
+> 🪟 **Windows or CLI-only users**: Don't want to install the macOS app? Jump directly to [Option 4: Windows & CLI Terminal Method](#windows-method).
+
 ### Option 1: Homebrew (Recommended)
 
 ```bash
@@ -43,6 +46,7 @@ brew install --cask openrouter-tracker
 
 ### Option 2: Direct Download (DMG)
 - 🍏 **macOS (Universal / Apple Silicon & Intel)**: [Download OpenRouterTracker.dmg](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.dmg)
+- 🪟 **Windows / Linux / Headless**: Jump to [Windows & CLI Method](#windows-method)
 
 ---
 
@@ -79,6 +83,7 @@ cd openrouter-tracker
 open build/OpenRouterTracker.app
 ```
 
+<a id="windows-method"></a>
 ### Option 4: Legacy Terminal Script (Windows / Linux / CLI)
 For users on Windows, Linux, or headless environments who do not want to install the macOS desktop application, use the legacy standalone terminal script:
 
