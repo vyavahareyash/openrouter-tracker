@@ -47,23 +47,19 @@ pkgbuild --root build/pkg_root --identifier com.openrouter.tracker --version 1.0
 rm -rf build/pkg_root
 
 if [ "$INSTALL_MODE" = true ]; then
-    echo "🚀 [6/6] Installing to /Applications and flushing widget cache..."
+    echo "🚀 [6/6] Installing to /Applications and enabling widget..."
     pkill -f OpenRouterTracker 2>/dev/null || true
     rm -rf /Applications/OpenRouterTracker.app
     cp -R "$APP_DST" /Applications/
-    pluginkit -r "$APP_DST/Contents/PlugIns/OpenRouterWidgetExtension.appex" 2>/dev/null || true
     pluginkit -a /Applications/OpenRouterTracker.app/Contents/PlugIns/OpenRouterWidgetExtension.appex
-    /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R /Applications/OpenRouterTracker.app
+    pluginkit -e use -i com.openrouter.tracker.widget
+    /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R -trusted /Applications/OpenRouterTracker.app
     killall NotificationCenter chronod 2>/dev/null || true
-    echo "✅ Successfully installed to /Applications and flushed widget cache!"
+    echo "✅ Successfully installed, enabled widget plugin, and refreshed daemons!"
 else
     echo "🚀 [6/6] Registering build with macOS LaunchServices..."
-    /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R "$APP_DST"
+    /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R -trusted "$APP_DST"
 fi
 
 echo ""
 echo "✨ Build Complete!"
-echo "Shareable Installers:"
-echo "  - DMG: $(pwd)/build/OpenRouterTracker.dmg"
-echo "  - PKG: $(pwd)/build/OpenRouterTracker.pkg"
-echo "  - ZIP: $(pwd)/build/OpenRouterTracker.zip"
