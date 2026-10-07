@@ -33,3 +33,59 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+
+      - name: Update Homebrew Tap
+        if: env.HOMEBREW_TAP_TOKEN != ''
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          SHA=$(shasum -a 256 build/OpenRouterTracker.dmg | awk '{print $1}')
+          echo "Updating tap for OpenRouter Tracker v${VERSION} (SHA: ${SHA})..."
+
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/vyavahareyash/homebrew-tap.git" tap_repo
+          cd tap_repo
+          mkdir -p Casks
+
+          cat <<EOF > Casks/openrouter-tracker.rb
+          cask "openrouter-tracker" do
+            version "${VERSION}"
+            sha256 "${SHA}"
+
+            url "https://github.com/vyavahareyash/openrouter-tracker/releases/download/v#{version}/OpenRouterTracker.dmg"
+            name "OpenRouter Tracker"
+            desc "Native macOS desktop widget & companion app for OpenRouter balance and rate limits"
+            homepage "https://github.com/vyavahareyash/openrouter-tracker"
+
+            depends_on macos: ">= :sonoma"
+
+            app "OpenRouterTracker.app"
+
+            postflight do
+              system_command "/usr/bin/pluginkit",
+                             args: ["-a", "#{appdir}/OpenRouterTracker.app/Contents/PlugIns/OpenRouterWidgetExtension.appex"]
+              system_command "/usr/bin/pluginkit",
+                             args: ["-e", "use", "-i", "com.openrouter.tracker.widget"]
+              system_command "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister",
+                             args: ["-f", "-R", "-trusted", "#{appdir}/OpenRouterTracker.app"]
+            end
+
+            zap trash: [
+              "~/Library/Application Scripts/group.com.openrouter.tracker",
+              "~/Library/Group Containers/group.com.openrouter.tracker",
+              "~/Library/Preferences/com.openrouter.tracker.plist",
+            ]
+          end
+          EOF
+
+          # Reformat leading indents to standard 2-spaces
+          sed -i '' 's/^          //' Casks/openrouter-tracker.rb || true
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/openrouter-tracker.rb
+          if ! git diff --cached --quiet; then
+            git commit -m "bump(openrouter-tracker): v${VERSION}"
+            git push origin main
+          fi
+
