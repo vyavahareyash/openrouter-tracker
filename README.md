@@ -12,6 +12,7 @@
 [![Privacy](https://img.shields.io/badge/Privacy-100%25_On--Device-7C3AED)](PRIVACY_POLICY.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/badge/Download-Latest_DMG-06B6D4?logo=apple)](https://github.com/vyavahareyash/openrouter-tracker/releases/latest)
+[![Buy Me A Coffee](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/vyavahareyash)
 
 OpenRouter Tracker is a native macOS desktop widget and companion app designed for developers, engineering teams, and autonomous AI agents. It gives you instant glanceability over your OpenRouter credit balances, usage pacing, and rate limits directly on your desktop—with **zero background battery drain** and an **interactive 1-click refresh button**.
 
@@ -177,6 +178,16 @@ Full architectural specifications, developer guides, and user manuals are organi
 ## Private by Default
 
 OpenRouter Tracker makes **zero network calls** to any third-party analytics, tracking, or intermediary server. Outbound HTTPS traffic connects exclusively to official OpenRouter endpoints (`https://openrouter.ai/api/v1/*`). Review our formal [Privacy Policy](PRIVACY_POLICY.md).
+
+---
+
+## Support Development
+
+OpenRouter Tracker is 100% free, private, and open-source with zero ads, zero trackers, and zero subscriptions. If OpenRouter Tracker helps you keep track of your API balance and budget, buying a coffee or sponsoring development is greatly appreciated!
+
+<a href="https://buymeacoffee.com/vyavahareyash" target="_blank">
+  <img src="assets/bmc_official_button.png" alt="Buy Me A Coffee" height="46">
+</a>
 
 ---
 
