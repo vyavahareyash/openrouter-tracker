@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.6] - 2026-10-08
+
+### Added
+- **Motion Graphics Banner**: Code-synthesized 18fps animated banner (`assets/banner.gif`) capturing 1-click interactive tactile refresh, 360° arrow spin, and real-time balance flash.
+- **GitHub Social Preview**: Dedicated 1280×640 2:1 isometric hero thumbnail (`assets/thumbnail.png`) featuring 3D floating desktop widgets and feature pills.
+- **Motion & Asset Scripts**: `scripts/generate_motion_banner.py` and `scripts/generate_github_thumbnail.py` for automated reproducible branding asset synthesis.
+
+### Changed
+- **Redesigned App Icon**: Modern circular instrument dial emblem with polished silver bezel, cyan-to-violet radial gauge arc, and slanted neural circuit API key across host app, widget extension, and `Assets.xcassets`.
+- **README Header**: Switched header visual to motion graphics banner.
+
+---
+
 ## [1.0.0] - 2026-10-07
 
 ### Added
