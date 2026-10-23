@@ -1,5 +1,5 @@
 # ==============================================================================
-# OpenRouter Tracker - Automated Windows Installer
+# OpenRouter Tracker - Automated Windows Installer & Updater
 # No git clone or manual build required.
 #
 # Usage (run in PowerShell):
@@ -14,32 +14,46 @@ $ExePath = "$InstallDir\OpenRouterTracker.exe"
 $StartMenuDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
 $ShortcutPath = "$StartMenuDir\OpenRouter Tracker.lnk"
 
+$IsUpgrade = Test-Path $ExePath
+
 Write-Host "========================================================" -ForegroundColor Cyan
-Write-Host "       Installing OpenRouter Tracker for Windows        " -ForegroundColor Cyan
+if ($IsUpgrade) {
+    Write-Host "       Updating OpenRouter Tracker for Windows          " -ForegroundColor Cyan
+} else {
+    Write-Host "       Installing OpenRouter Tracker for Windows        " -ForegroundColor Cyan
+}
 Write-Host "========================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# 1. Fetch latest release info from GitHub API
+# 1. Close running process if upgrading to release file lock
+$RunningProcess = Get-Process -Name "OpenRouterTracker" -ErrorAction SilentlyContinue
+if ($RunningProcess) {
+    Write-Host "🛑 [0/4] Stopping active OpenRouter Tracker process for update..." -ForegroundColor DarkYellow
+    Stop-Process -Name "OpenRouterTracker" -Force
+    Start-Sleep -Milliseconds 600
+}
+
+# 2. Fetch latest release info from GitHub API
 Write-Host "🔍 [1/4] Checking latest release from GitHub ($Repo)..." -ForegroundColor Yellow
 $ApiUrl = "https://api.github.com/repos/$Repo/releases/latest"
 
 try {
     $Release = Invoke-RestMethod -Uri $ApiUrl -Headers @{ "User-Agent" = "PowerShell" }
     $TagName = $Release.tag_name
-    Write-Host "   Found release: $TagName" -ForegroundColor Green
+    Write-Host "   Target release: $TagName" -ForegroundColor Green
 } catch {
     Write-Host "⚠️ Could not query GitHub API for releases, falling back to direct download link." -ForegroundColor DarkYellow
     $TagName = "latest"
 }
 
-# 2. Prepare installation directory
+# 3. Prepare installation directory
 Write-Host "📁 [2/4] Setting up directory: $InstallDir" -ForegroundColor Yellow
 if (-not (Test-Path $InstallDir)) {
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 }
 
-# 3. Download the standalone executable
-Write-Host "⬇️  [3/4] Downloading OpenRouterTracker.exe..." -ForegroundColor Yellow
+# 4. Download latest executable
+Write-Host "⬇️  [3/4] Downloading latest OpenRouterTracker.exe..." -ForegroundColor Yellow
 $DownloadUrl = "https://github.com/$Repo/releases/download/$TagName/OpenRouterTracker.exe"
 $FallbackZipUrl = "https://github.com/$Repo/releases/download/$TagName/OpenRouterTracker-windows-x64.zip"
 
@@ -48,7 +62,6 @@ try {
     Invoke-WebRequest -Uri $DownloadUrl -OutFile $ExePath -UseBasicParsing
     $Downloaded = $true
 } catch {
-    # If direct exe is not present, try zip
     try {
         $ZipPath = "$InstallDir\package.zip"
         Invoke-WebRequest -Uri $FallbackZipUrl -OutFile $ZipPath -UseBasicParsing
@@ -61,8 +74,8 @@ try {
     }
 }
 
-# 4. Create Windows Start Menu Shortcut
-Write-Host "🔗 [4/4] Creating Start Menu shortcut..." -ForegroundColor Yellow
+# 5. Create / Update Windows Start Menu Shortcut
+Write-Host "🔗 [4/4] Updating Start Menu shortcut..." -ForegroundColor Yellow
 try {
     $WshShell = New-Object -ComObject WScript.Shell
     $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
@@ -70,14 +83,19 @@ try {
     $Shortcut.WorkingDirectory = $InstallDir
     $Shortcut.Description = "OpenRouter Desktop Tracker & Widget"
     $Shortcut.Save()
-    Write-Host "   Shortcut created at: $ShortcutPath" -ForegroundColor Green
+    Write-Host "   Shortcut ready at: $ShortcutPath" -ForegroundColor Green
 } catch {
     Write-Host "   (Skipped shortcut creation)" -ForegroundColor Gray
 }
 
 Write-Host ""
-Write-Host "✨ Successfully Installed OpenRouter Tracker!" -ForegroundColor Green
-Write-Host "   Executable location: $ExePath" -ForegroundColor Gray
+if ($IsUpgrade) {
+    Write-Host "✨ Successfully Updated OpenRouter Tracker to $TagName!" -ForegroundColor Green
+} else {
+    Write-Host "✨ Successfully Installed OpenRouter Tracker ($TagName)!" -ForegroundColor Green
+}
+Write-Host "   Location: $ExePath" -ForegroundColor Gray
+Write-Host "   Data & keys: Saved safely in $env:APPDATA\OpenRouterTracker" -ForegroundColor DarkCyan
 Write-Host ""
 
 $Launch = Read-Host "Would you like to start OpenRouter Tracker now? (Y/n)"
