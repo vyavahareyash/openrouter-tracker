@@ -4,10 +4,14 @@ __pycache__/
 
 # Build artifacts
 build/
+dist/
+*.spec
 DerivedData/
 *.xcuserstate
 xcuserdata/
 *.xcscmblueprint
+.openrouter_tracker/
+*.pyc
 
 # Local agent scratch & issues
 .scratch/

@@ -1,0 +1,3 @@
+@echo off
+echo Starting OpenRouter Tracker for Windows...
+python windows\main.py %*

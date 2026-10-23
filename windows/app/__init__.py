@@ -1,0 +1,1 @@
+"""Companion application components for Windows."""

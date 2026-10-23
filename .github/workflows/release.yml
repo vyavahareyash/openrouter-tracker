@@ -9,8 +9,9 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    name: Build & Publish Release DMG
+  # ── 1. Build macOS Release ──────────────────────────────────────────────────
+  build-macos:
+    name: Build macOS DMG
     runs-on: macos-14
     steps:
       - name: Checkout Code
@@ -26,10 +27,75 @@ jobs:
         run: |
           ./scripts/create_dmg.sh build/OpenRouterTracker.app build/OpenRouterTracker.dmg "OpenRouter Tracker"
 
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-release-dmg
+          path: build/OpenRouterTracker.dmg
+
+  # ── 2. Build Windows Release ────────────────────────────────────────────────
+  build-windows:
+    name: Build Windows Executable & Archive
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r windows/requirements.txt pyinstaller pillow altgraph
+
+      - name: Run Windows Unit Tests
+        run: |
+          python -m unittest windows.tests.test_windows_core -v
+
+      - name: Build Standalone Windows Executable & Zip
+        run: |
+          python build_windows.py --no-test
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release-binaries
+          path: |
+            dist/OpenRouterTracker.exe
+            dist/OpenRouterTracker-windows-x64.zip
+
+  # ── 3. Publish Multi-Platform Release ───────────────────────────────────────
+  publish-release:
+    name: Publish Multi-Platform GitHub Release
+    needs: [build-macos, build-windows]
+    runs-on: macos-14
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-release-dmg
+          path: release-assets
+
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-release-binaries
+          path: release-assets
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/OpenRouterTracker.dmg
+          files: |
+            release-assets/OpenRouterTracker.dmg
+            release-assets/OpenRouterTracker.exe
+            release-assets/OpenRouterTracker-windows-x64.zip
           draft: false
           prerelease: false
           generate_release_notes: true
@@ -40,7 +106,7 @@ jobs:
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          SHA=$(shasum -a 256 build/OpenRouterTracker.dmg | awk '{print $1}')
+          SHA=$(shasum -a 256 release-assets/OpenRouterTracker.dmg | awk '{print $1}')
           echo "Updating tap for OpenRouter Tracker v${VERSION} (SHA: ${SHA})..."
 
           git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/vyavahareyash/homebrew-tap.git" tap_repo
@@ -90,4 +156,3 @@ jobs:
             git commit -m "bump(openrouter-tracker): v${VERSION}"
             git push origin main
           fi
-
