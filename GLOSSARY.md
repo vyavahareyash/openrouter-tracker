@@ -12,13 +12,17 @@ Ubiquitous language and domain concepts for the OpenRouter Desktop Tracker and W
 - **Key Limit (`keyLimit`)**: Optional credit limit configured on an API key.
 - **Key Remaining (`keyRemaining`)**: Calculated balance remaining under a key's limit (`keyLimit - keyUsage`).
 - **Periodic Breakdown (`usageDaily`, `usageWeekly`, `usageMonthly`)**: Velocity metrics showing spending over standard time intervals.
-- **Free Tier (`isFreeTier`)**: State flag when an account has \$0 credits, zero usage limit, and relies on free model allocations.
+- **Free Tier (`isFreeTier`)**: State flag when an account has $0 credits, zero usage limit, and relies on free model allocations.
 
 ### Architecture & System Concepts
 
 - **Host App (`OpenRouterTrackerApp`)**: Companion macOS SwiftUI application managing credentials, multi-key configuration, and status inspection.
 - **Widget Extension (`OpenRouterWidgetExtension`)**: Native macOS WidgetKit extension hosted by macOS system daemon (`chronod`).
-- **Container Storage (`SharedStorage`)**: Filesystem-level shared persistence rooted in `~/Library/Containers/com.openrouter.tracker.widget/Data` enabling cross-process state access between App and Extension.
+- **Windows Companion App (`windows/main.py`)**: Native Windows companion application built with PySide6 (Qt 6) managing credentials, multi-key configuration, and status inspection.
+- **Windows Desktop Widget (`DesktopWidget`)**: Frameless translucent desktop widget supporting Small and Medium modes, interactive 1-click refresh, and desktop pinning.
+- **Windows DPAPI (`win32crypt`)**: Native Windows Data Protection API hardware-backed encryption mechanism storing API keys encrypted per-user.
+- **Windows System Tray (`SystemTrayManager`)**: Windows notification area integration coordinating companion app and desktop widget lifecycle.
+- **Container Storage (`SharedStorage`)**: Filesystem-level shared persistence rooted in `~/Library/Containers/com.openrouter.tracker.widget/Data` (macOS) and `%APPDATA%\OpenRouterTracker` (Windows) enabling cross-process state access between App and Extension/Widget.
 - **Timeline Entry (`OpenRouterEntry`)**: Temporal snapshot supplied to WidgetKit's `TimelineProvider` rendering the widget interface.
 - **Refresh Intent (`RefreshBalanceIntent`)**: Interactive `AppIntent` triggered by widget button tap, executing `OpenRouterService.refreshWidgetKey()` and calling `reloadAllTimelines()`.
 - **Ephemeral Session**: Stateless `URLSession` configuration preventing disk caching of auth headers and sensitive JSON payloads.

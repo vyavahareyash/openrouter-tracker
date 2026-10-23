@@ -5,16 +5,17 @@
 # OpenRouter Tracker
 
 [![macOS](https://img.shields.io/badge/macOS-14_Sonoma+-000000?logo=apple&logoColor=white)](https://apple.com/macos)
-[![Windows / CLI](https://img.shields.io/badge/Windows%20%2F%20CLI-Legacy_Script-3776AB?logo=python&logoColor=white)](#windows-method)
+[![Windows](https://img.shields.io/badge/Windows-10_%2F_11-0078D6?logo=windows&logoColor=white)](#windows-installation)
 [![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
-[![Framework](https://img.shields.io/badge/UI-SwiftUI_%26_WidgetKit-0A84FF)](https://developer.apple.com/xcode/swiftui/)
+[![Python / Qt6](https://img.shields.io/badge/Python-3.11_%7C_PySide6-41CD52?logo=python&logoColor=white)](https://www.qt.io/)
+[![UI](https://img.shields.io/badge/UI-SwiftUI_%26_PySide6-0A84FF)](https://developer.apple.com/xcode/swiftui/)
 [![Background](https://img.shields.io/badge/Daemon-Zero_Background_Tasks-success)](#zero-background-resource-usage)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25_On--Device-7C3AED)](PRIVACY_POLICY.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/badge/Download-Latest_DMG-06B6D4?logo=apple)](https://github.com/vyavahareyash/openrouter-tracker/releases/latest)
 [![Buy Me A Coffee](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/vyavahareyash)
 
-OpenRouter Tracker is a native macOS desktop widget and companion app designed for developers, engineering teams, and autonomous AI agents. It gives you instant glanceability over your OpenRouter credit balances, usage pacing, and rate limits directly on your desktop—with **zero background battery drain** and an **interactive 1-click refresh button**.
+OpenRouter Tracker is a native macOS and Windows desktop widget and companion app designed for developers, engineering teams, and autonomous AI agents. It gives you instant glanceability over your OpenRouter credit balances, usage pacing, and rate limits directly on your desktop—with **zero background battery drain** and an **interactive 1-click refresh button**.
 
 ---
 
@@ -36,7 +37,7 @@ Glanceable Balance = Real-time Account Balance - Key Spend
 
 ## Downloads & Installation
 
-> 🪟 **Windows or CLI-only users**: Don't want to install the macOS app? Jump directly to [Option 4: Windows & CLI Terminal Method](#windows-method).
+> 🪟 **Windows users**: Jump directly to [Option 4: Windows Native App & Desktop Widget](#windows-installation) for the 1-line PowerShell installer or standalone download.
 
 ### Option 1: Homebrew (Recommended)
 
@@ -50,9 +51,10 @@ brew update
 brew upgrade --cask openrouter-tracker
 ```
 
-### Option 2: Direct Download (DMG)
+### Option 2: Direct Download (Pre-built Installers)
 - 🍏 **macOS (Universal / Apple Silicon & Intel)**: [Download OpenRouterTracker.dmg](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.dmg)
-- 🪟 **Windows / Linux / Headless**: Jump to [Windows & CLI Method](#windows-method)
+- 🪟 **Windows (Standalone .EXE)**: [Download OpenRouterTracker.exe](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.exe)
+- 🪟 **Windows (Portable ZIP)**: [Download OpenRouterTracker-windows-x64.zip](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker-windows-x64.zip)
 
 ---
 
@@ -89,8 +91,44 @@ cd openrouter-tracker
 open build/OpenRouterTracker.app
 ```
 
+<a id="windows-installation"></a>
+### Option 4: Windows Native App & Desktop Widget (Recommended for Windows)
+
+No repository cloning or developer tools required!
+
+#### Method A: 1-Line PowerShell Web Installer (Zero Clone)
+Run the following in PowerShell to automatically download the latest release and create Start Menu shortcuts:
+```powershell
+irm https://raw.githubusercontent.com/vyavahareyash/openrouter-tracker/main/scripts/install.ps1 | iex
+```
+
+#### Method B: Standalone Download (No Install Required)
+1. Download [OpenRouterTracker.exe](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker.exe) (or [OpenRouterTracker-windows-x64.zip](https://github.com/vyavahareyash/openrouter-tracker/releases/latest/download/OpenRouterTracker-windows-x64.zip)).
+2. Double-click `OpenRouterTracker.exe` to run immediately.
+
+#### Method C: Run from Source / Developer Mode
+```powershell
+# 1. Install dependencies
+pip install -r windows/requirements.txt
+
+# 2. Launch
+.\run_windows.bat
+
+# Or directly with Python flags:
+python windows/main.py             # Launches Companion App + Desktop Widget + System Tray
+python windows/main.py --widget-only # Launches only Desktop Widget and System Tray
+python windows/main.py --app-only    # Launches only Companion App
+```
+
+- **Desktop Widget**: Frameless, translucent, draggable anywhere on your desktop. Supports both **Small** (radial donut gauge) and **Medium** (key metrics + account pool burn bar) sizes.
+- **Tactile 1-Click Refresh**: Tap the `🔄` button directly on the desktop widget to instantly query the latest balance in-place.
+- **Companion App**: Full multi-key manager, inline nickname renaming, budget gauges, periodic spend velocity (Today/Week/Month), and live key testing before saving.
+- **Windows System Tray**: Notification area icon (`QSystemTrayIcon`) with right-click menu to switch active widget keys, resize widgets, or refresh balances.
+- **Windows DPAPI Security**: API keys are securely encrypted at rest per-user via Windows Data Protection API (`win32crypt.CryptProtectData`).
+- **Compile Standalone Executable**: Run `.\build_windows.bat` to package into a standalone binary with PyInstaller.
+
 <a id="windows-method"></a>
-### Option 4: Legacy Terminal Script (Windows / Linux / CLI)
+### Option 5: Legacy Standalone Script (Headless / Linux / CLI)
 For users on Windows, Linux, or headless environments who do not want to install the macOS desktop application, use the legacy standalone terminal script:
 
 ```bash
@@ -108,12 +146,13 @@ python3 scripts/check_usage.py [YOUR_KEY]
 
 ## Key Features
 
-- ⚡ **1-Click Interactive Widget Refresh**: Powered by `AppIntents`. Click the refresh icon directly on the widget to update balances in < 500ms without opening the host application.
-- 🔋 **Zero Battery Overhead**: Managed strictly by macOS `chronod`. No continuous daemon, timer loops, or menubar CPU hogs.
-- 🖥️ **Multiple Widget Sizes**: Choose between `systemSmall` (compact balance beacon) and `systemMedium` (detailed credit limit burn bar and rate-limit counters).
-- 🔑 **Multi-Key Management**: Add multiple project or client keys, label them with custom nicknames, and toggle which key appears on your desktop with one click.
-- 🔐 **Defense-in-Depth Privacy**: Keys are encrypted via Apple Keychain (`kSecClassGenericPassword`) and cached in the sandboxed App Group container (`group.com.openrouter.tracker`).
-- 📊 **Rate Limit Gauges**: View real-time requests-per-second and hourly rate limit allocations returned by OpenRouter's tier system.
+- ⚡ **1-Click Interactive Widget Refresh**: Tap the `🔄` button directly on the desktop widget to update balances in-place in < 500ms without opening the host application (powered by native `AppIntents` on macOS and asynchronous non-blocking thread workers on Windows).
+- 🔋 **Zero Idle Resource Overhead**: Uses 0% idle CPU cycles and no polling battery drain. Managed by system scheduler (`chronod`) on macOS and an event-driven Qt loop on Windows.
+- 🖥️ **Dual Widget Sizes (Small & Medium)**: Choose between **Small** (compact radial donut gauge and remaining balance) and **Medium** (dual-column view with key budget gauges, limit counters, and account pool burn bar).
+- 🔑 **Multi-Key Management**: Add, name, test, and monitor multiple organization or project keys with inline renaming and 1-click active widget key designation.
+- 🔐 **Hardware-Backed Credential Encryption**: Keys are never stored in plain text. Encrypted using **Apple Keychain Services (`kSecClassGenericPassword`)** on macOS and **Windows DPAPI (`win32crypt.CryptProtectData`)** on Windows.
+- 🪟 **Windows System Tray Integration**: Compact tray icon in the Windows notification area with instant context actions (toggle companion app, toggle widget, switch size, refresh, and switch active key).
+- 📊 **Glanceable Velocity & Limits**: View real-time daily, weekly, and monthly spending velocity alongside total account pool depletion.
 
 ---
 
@@ -150,12 +189,22 @@ python3 scripts/check_usage.py [YOUR_KEY]
 
 ---
 
-## Adding the Widget to macOS Desktop
+## Using the Widget on Your Desktop
 
+### 🍏 On macOS (Sonoma 14+)
 1. Open **OpenRouter Tracker** once and add your API key (`sk-or-v1-...`).
 2. Right-click any open area on your macOS Desktop and select **"Edit Widgets..."**.
 3. Search for **"OpenRouter"** in the widget gallery.
 4. Drag either the **Small** or **Medium** widget onto your desktop or Notification Center.
+
+### 🪟 On Windows (10 & 11)
+1. Run OpenRouter Tracker via the [1-line installer](#windows-installation), standalone `OpenRouterTracker.exe`, or `.\run_windows.bat`.
+2. Add your OpenRouter API key in the Companion Application.
+3. The frameless desktop widget appears automatically:
+   - **Move**: Click and drag anywhere on the widget to reposition it. Its desktop coordinates are saved automatically.
+   - **Switch Size**: Right-click the widget and select **"Switch to Small Widget"** or **"Switch to Medium Widget"**.
+   - **Pin to Desktop / Always on Top**: Right-click to toggle **"Always on Top"** or pin it behind active workspace windows.
+   - **System Tray**: Right-click the OpenRouter Tracker icon in the Windows taskbar notification area to quickly refresh balances, switch active keys, or toggle visibility.
 
 ---
 

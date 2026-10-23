@@ -23,8 +23,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # ── 2. Build & Test ─────────────────────────────────────────────────────────
-  build-and-test:
+  # ── 2. Build & Test (macOS) ─────────────────────────────────────────────────
+  build-and-test-macos:
     name: Build & Test (macOS Sonoma)
     runs-on: macos-14
     steps:
@@ -51,3 +51,30 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
+
+  # ── 3. Build & Test (Windows) ───────────────────────────────────────────────
+  build-and-test-windows:
+    name: Build & Test (Windows 10/11)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r windows/requirements.txt pyinstaller pillow altgraph
+
+      - name: Run Windows Unit Tests
+        run: |
+          python -m unittest windows.tests.test_windows_core -v
+
+      - name: Build Standalone Windows Executable
+        run: |
+          python build_windows.py --no-test

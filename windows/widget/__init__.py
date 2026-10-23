@@ -1,0 +1,1 @@
+"""Desktop widget components for Windows."""
