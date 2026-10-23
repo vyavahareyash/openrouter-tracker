@@ -36,6 +36,7 @@ def main() -> int:
 
     # Wire up signals between components
     main_window.data_updated.connect(desktop_widget.load_data)
+    main_window.theme.theme_changed.connect(desktop_widget.apply_theme)
     desktop_widget.open_companion_requested.connect(main_window.show)
     desktop_widget.open_companion_requested.connect(main_window.raise_)
     desktop_widget.open_companion_requested.connect(main_window.activateWindow)

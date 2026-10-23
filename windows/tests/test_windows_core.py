@@ -204,6 +204,28 @@ class TestUIComponents(unittest.TestCase):
         self.assertEqual(widget.mode, "medium")
         self.assertEqual(widget.size(), DesktopWidget.MEDIUM_SIZE)
 
+    def test_desktop_widget_theme_sync(self):
+        from windows.widget.desktop_widget import DesktopWidget
+        from windows.core.theme import ThemeManager
+
+        theme = ThemeManager.get_instance()
+        widget = DesktopWidget()
+
+        # Switch to light mode
+        theme.set_mode("light")
+        self.assertFalse(theme.is_dark())
+        self.assertIn("#0F172A", widget.lbl_nickname.styleSheet())
+        self.assertEqual(widget.theme.widget_bg_qcolor.name().upper(), "#FFFFFF")
+
+        # Switch to dark mode
+        theme.set_mode("dark")
+        self.assertTrue(theme.is_dark())
+        self.assertIn("#F4F4F5", widget.lbl_nickname.styleSheet())
+        self.assertEqual(widget.theme.widget_bg_qcolor.name().upper(), "#1C1C20")
+
+        # Reset
+        theme.set_mode("system")
+
     def test_main_window_empty_and_populated(self):
         from windows.app.main_window import MainWindow
         win = MainWindow()

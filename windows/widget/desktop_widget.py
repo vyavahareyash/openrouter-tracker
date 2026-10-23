@@ -153,17 +153,26 @@ class DesktopWidget(QWidget):
 
         self._build_content()
 
-    def _build_content(self) -> None:
-        while self.card_layout.count():
-            item = self.card_layout.takeAt(0)
+    def _clear_layout(self, layout) -> None:
+        while layout.count():
+            item = layout.takeAt(0)
             widget = item.widget()
-            if widget:
+            if widget is not None:
                 widget.deleteLater()
+            else:
+                sub_layout = item.layout()
+                if sub_layout is not None:
+                    self._clear_layout(sub_layout)
+
+    def _build_content(self) -> None:
+        self._clear_layout(self.card_layout)
 
         if self.mode == "medium":
             self._build_medium_layout()
         else:
             self._build_small_layout()
+
+        self.apply_theme()
 
     def _build_small_layout(self) -> None:
         header = QHBoxLayout()
@@ -171,11 +180,10 @@ class DesktopWidget(QWidget):
         header.setSpacing(4)
 
         dot = QLabel("●")
-        dot.setStyleSheet(f"color: {OpenRouterTheme.NEON_VIOLET}; font-size: 8px;")
+        dot.setStyleSheet(f"color: {OpenRouterTheme.NEON_VIOLET}; font-size: 8px; background: transparent; border: none;")
         header.addWidget(dot)
 
         self.lbl_nickname = QLabel("OpenRouter")
-        self.lbl_nickname.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 11px; font-weight: bold;")
         self.lbl_nickname.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         header.addWidget(self.lbl_nickname)
 
@@ -205,17 +213,15 @@ class DesktopWidget(QWidget):
         key_header = QHBoxLayout()
         key_header.setSpacing(4)
         dot = QLabel("●")
-        dot.setStyleSheet(f"color: {OpenRouterTheme.ELECTRIC_BLUE}; font-size: 8px;")
+        dot.setStyleSheet(f"color: {OpenRouterTheme.ELECTRIC_BLUE}; font-size: 8px; background: transparent; border: none;")
         key_header.addWidget(dot)
 
         self.lbl_nickname = QLabel("OpenRouter")
-        self.lbl_nickname.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 11px; font-weight: bold;")
         key_header.addWidget(self.lbl_nickname)
         key_header.addStretch()
         left_vbox.addLayout(key_header)
 
         self.lbl_masked = QLabel("••••••••")
-        self.lbl_masked.setStyleSheet(f"color: {self.theme.text_muted}; font-family: Consolas, monospace; font-size: 8px;")
         left_vbox.addWidget(self.lbl_masked)
 
         left_vbox.addSpacing(2)
@@ -232,20 +238,15 @@ class DesktopWidget(QWidget):
         stats_vbox.setContentsMargins(0, 0, 0, 0)
         stats_vbox.setSpacing(4)
 
-        lbl_spent_title = QLabel("SPENT")
-        lbl_spent_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7px; font-weight: bold;")
+        self.lbl_spent_title = QLabel("SPENT")
         self.lbl_spent_val = QLabel("$0.00")
-        self.lbl_spent_val.setStyleSheet(f"color: {OpenRouterTheme.NEON_VIOLET}; font-size: 11px; font-weight: bold;")
-
-        lbl_limit_title = QLabel("LIMIT")
-        lbl_limit_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7px; font-weight: bold;")
+        self.lbl_limit_title = QLabel("LIMIT")
         self.lbl_limit_val = QLabel("Unlimited")
-        self.lbl_limit_val.setStyleSheet(f"color: {OpenRouterTheme.AMBER_WARNING}; font-size: 11px; font-weight: bold;")
 
-        stats_vbox.addWidget(lbl_spent_title)
+        stats_vbox.addWidget(self.lbl_spent_title)
         stats_vbox.addWidget(self.lbl_spent_val)
         stats_vbox.addSpacing(2)
-        stats_vbox.addWidget(lbl_limit_title)
+        stats_vbox.addWidget(self.lbl_limit_title)
         stats_vbox.addWidget(self.lbl_limit_val)
         stats_vbox.addStretch()
 
@@ -255,30 +256,20 @@ class DesktopWidget(QWidget):
         main_hbox.addLayout(left_vbox, stretch=3)
 
         # Divider
-        divider = QFrame()
-        divider.setFrameShape(QFrame.Shape.VLine)
-        div_color = "rgba(255, 255, 255, 0.12)" if self.theme.is_dark() else "rgba(0, 0, 0, 0.08)"
-        divider.setStyleSheet(f"color: {div_color};")
-        main_hbox.addWidget(divider)
+        self.divider = QFrame()
+        self.divider.setFrameShape(QFrame.Shape.VLine)
+        main_hbox.addWidget(self.divider)
 
         # Right Column: Account Overview Card
-        right_card = QWidget()
-        border_col = "rgba(59, 130, 246, 0.18)" if self.theme.is_dark() else "rgba(59, 130, 246, 0.22)"
-        right_card.setStyleSheet(f"""
-            QWidget {{
-                background-color: rgba(59, 130, 246, 0.08);
-                border: 1px solid {border_col};
-                border-radius: 8px;
-            }}
-        """)
-        right_vbox = QVBoxLayout(right_card)
+        self.right_card = QFrame()
+        self.right_card.setObjectName("rightAccountCard")
+        right_vbox = QVBoxLayout(self.right_card)
         right_vbox.setContentsMargins(8, 6, 8, 6)
         right_vbox.setSpacing(3)
 
         acct_header = QHBoxLayout()
-        lbl_acct_title = QLabel("Account Total")
-        lbl_acct_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 9px; font-weight: 600; border: none; background: transparent;")
-        acct_header.addWidget(lbl_acct_title)
+        self.lbl_acct_title = QLabel("Account Total")
+        acct_header.addWidget(self.lbl_acct_title)
         acct_header.addStretch()
 
         self.btn_refresh = RefreshButton()
@@ -286,12 +277,10 @@ class DesktopWidget(QWidget):
         acct_header.addWidget(self.btn_refresh)
         right_vbox.addLayout(acct_header)
 
-        lbl_bal_caption = QLabel("Available Balance")
-        lbl_bal_caption.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 8px; border: none; background: transparent;")
-        right_vbox.addWidget(lbl_bal_caption)
+        self.lbl_bal_caption = QLabel("Available Balance")
+        right_vbox.addWidget(self.lbl_bal_caption)
 
         self.lbl_acct_balance = QLabel("$0.00")
-        self.lbl_acct_balance.setStyleSheet(f"color: {OpenRouterTheme.ELECTRIC_BLUE}; font-size: 15px; font-weight: bold; border: none; background: transparent;")
         right_vbox.addWidget(self.lbl_acct_balance)
 
         self.burn_bar = QWidget()
@@ -302,9 +291,7 @@ class DesktopWidget(QWidget):
         burn_stats = QHBoxLayout()
         burn_stats.setContentsMargins(0, 0, 0, 0)
         self.lbl_burn_used = QLabel("Used $0")
-        self.lbl_burn_used.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7.5px; border: none; background: transparent;")
         self.lbl_burn_total = QLabel("Total $0")
-        self.lbl_burn_total.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7.5px; border: none; background: transparent;")
         burn_stats.addWidget(self.lbl_burn_used)
         burn_stats.addStretch()
         burn_stats.addWidget(self.lbl_burn_total)
@@ -313,19 +300,71 @@ class DesktopWidget(QWidget):
         right_vbox.addStretch()
 
         self.lbl_updated = QLabel("Updated just now")
-        self.lbl_updated.setStyleSheet(f"color: {self.theme.text_muted}; font-size: 7px; border: none; background: transparent;")
         self.lbl_updated.setAlignment(Qt.AlignmentFlag.AlignRight)
         right_vbox.addWidget(self.lbl_updated)
 
-        main_hbox.addWidget(right_card, stretch=2)
+        main_hbox.addWidget(self.right_card, stretch=2)
         self.card_layout.addLayout(main_hbox)
 
-    def _on_theme_changed(self) -> None:
-        self._build_content()
-        self.load_data()
+    def apply_theme(self) -> None:
+        is_dark = self.theme.is_dark()
+        pri = self.theme.text_primary
+        sec = self.theme.text_secondary
+        muted = self.theme.text_muted
+
+        if hasattr(self, "lbl_nickname"):
+            self.lbl_nickname.setStyleSheet(f"color: {pri}; font-size: 11px; font-weight: bold; background: transparent; border: none;")
+
+        if hasattr(self, "btn_refresh"):
+            self.btn_refresh.apply_theme()
+
+        if hasattr(self, "radial_gauge"):
+            self.radial_gauge.update()
+
+        if self.mode == "medium":
+            if hasattr(self, "lbl_masked"):
+                self.lbl_masked.setStyleSheet(f"color: {muted}; font-family: Consolas, monospace; font-size: 8px; background: transparent; border: none;")
+            if hasattr(self, "lbl_spent_title"):
+                self.lbl_spent_title.setStyleSheet(f"color: {sec}; font-size: 7px; font-weight: bold; background: transparent; border: none;")
+            if hasattr(self, "lbl_spent_val"):
+                self.lbl_spent_val.setStyleSheet(f"color: {OpenRouterTheme.NEON_VIOLET}; font-size: 11px; font-weight: bold; background: transparent; border: none;")
+            if hasattr(self, "lbl_limit_title"):
+                self.lbl_limit_title.setStyleSheet(f"color: {sec}; font-size: 7px; font-weight: bold; background: transparent; border: none;")
+            if hasattr(self, "lbl_limit_val"):
+                self.lbl_limit_val.setStyleSheet(f"color: {OpenRouterTheme.AMBER_WARNING}; font-size: 11px; font-weight: bold; background: transparent; border: none;")
+            if hasattr(self, "divider"):
+                div_color = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.08)"
+                self.divider.setStyleSheet(f"color: {div_color};")
+            if hasattr(self, "right_card"):
+                border_col = "rgba(59, 130, 246, 0.18)" if is_dark else "rgba(59, 130, 246, 0.22)"
+                self.right_card.setStyleSheet(f"""
+                    QFrame#rightAccountCard {{
+                        background-color: rgba(59, 130, 246, 0.08);
+                        border: 1px solid {border_col};
+                        border-radius: 8px;
+                    }}
+                """)
+            if hasattr(self, "lbl_acct_title"):
+                self.lbl_acct_title.setStyleSheet(f"color: {sec}; font-size: 9px; font-weight: 600; border: none; background: transparent;")
+            if hasattr(self, "lbl_bal_caption"):
+                self.lbl_bal_caption.setStyleSheet(f"color: {sec}; font-size: 8px; border: none; background: transparent;")
+            if hasattr(self, "lbl_acct_balance"):
+                self.lbl_acct_balance.setStyleSheet(f"color: {OpenRouterTheme.ELECTRIC_BLUE}; font-size: 15px; font-weight: bold; border: none; background: transparent;")
+            if hasattr(self, "lbl_burn_used"):
+                self.lbl_burn_used.setStyleSheet(f"color: {sec}; font-size: 7.5px; border: none; background: transparent;")
+            if hasattr(self, "lbl_burn_total"):
+                self.lbl_burn_total.setStyleSheet(f"color: {sec}; font-size: 7.5px; border: none; background: transparent;")
+            if hasattr(self, "lbl_updated"):
+                self.lbl_updated.setStyleSheet(f"color: {muted}; font-size: 7px; border: none; background: transparent;")
+
         self.update()
 
+    def _on_theme_changed(self) -> None:
+        self.apply_theme()
+        self.load_data()
+
     def load_data(self) -> None:
+        self.theme.sync_from_storage()
         payload = SharedStorage.get_widget_payload()
         if not payload:
             widget_key = SharedStorage.get_widget_key()

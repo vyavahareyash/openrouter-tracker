@@ -39,6 +39,14 @@ class ThemeManager(QObject):
         SharedStorage.set_setting("theme_mode", mode)
         self.theme_changed.emit()
 
+    def sync_from_storage(self) -> bool:
+        disk_mode = SharedStorage.get_setting("theme_mode", "system")
+        if disk_mode != self._mode:
+            self._mode = disk_mode
+            self.theme_changed.emit()
+            return True
+        return False
+
     def is_dark(self) -> bool:
         if self._mode == "dark":
             return True
