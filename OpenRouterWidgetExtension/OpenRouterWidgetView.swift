@@ -220,6 +220,7 @@ struct MediumWidgetView: View {
 
                 Spacer(minLength: 0)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Divider().opacity(0.3)
 

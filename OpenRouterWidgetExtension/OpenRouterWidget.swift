@@ -48,5 +48,6 @@ struct OpenRouterWidget: Widget {
         .configurationDisplayName("OpenRouter Balance")
         .description("Track key budget, remaining credits, and account totals with 1-click refresh.")
         .supportedFamilies([.systemSmall, .systemMedium])
+        .contentMarginsDisabled()
     }
 }

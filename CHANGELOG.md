@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.5] - 2026-10-24
+
+### Fixed
+- **WidgetKit Content Margins**: Disable default macOS 14+ WidgetKit content margins (`.contentMarginsDisabled()`) and enable horizontal expansion on medium widget layout to eliminate excess empty space on widget borders.
+
+---
+
 ## [1.0.6] - 2026-10-08
 
 ### Added
