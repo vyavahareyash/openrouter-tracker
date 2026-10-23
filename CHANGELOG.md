@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.6] - 2026-10-24
+
+### Fixed
+- **Medium Widget Layout**: Restore proportional 88pt radial gauge, 140pt account overview card, and balanced 12pt spacing to eliminate center gap and optimize widget proportions.
+
+---
+
 ## [1.1.5] - 2026-10-24
 
 ### Fixed

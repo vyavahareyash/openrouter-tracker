@@ -6,17 +6,26 @@ import WidgetKit
 
 @MainActor
 func renderPNG<V: View>(view: V, width: CGFloat, height: CGFloat, isDark: Bool, to url: URL) {
+    let window = NSWindow(
+        contentRect: NSRect(x: 0, y: 0, width: width, height: height),
+        styleMask: [.borderless],
+        backing: .buffered,
+        defer: false
+    )
+    window.appearance = NSAppearance(named: isDark ? .darkAqua : .aqua)
+
     let hostingView = NSHostingView(rootView: view)
     hostingView.frame = NSRect(x: 0, y: 0, width: width, height: height)
     hostingView.appearance = NSAppearance(named: isDark ? .darkAqua : .aqua)
+    window.contentView = hostingView
+    window.layoutIfNeeded()
+
+    RunLoop.current.run(until: Date().addingTimeInterval(0.1))
 
     guard let bitmapRep = hostingView.bitmapImageRepForCachingDisplay(in: hostingView.bounds) else {
         fputs("Error: Failed to obtain bitmap image representation\n", stderr)
         return
     }
-    bitmapRep.size = NSSize(width: width, height: height)
-    bitmapRep.pixelsWide = Int(width * 2)
-    bitmapRep.pixelsHigh = Int(height * 2)
 
     hostingView.cacheDisplay(in: hostingView.bounds, to: bitmapRep)
 
