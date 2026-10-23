@@ -1,4 +1,4 @@
-"""Windows Companion Application matching macOS OpenRouterTrackerApp."""
+"""Windows Companion Application matching macOS OpenRouterTrackerApp with Light & Dark themes."""
 
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPushButton,
     QScrollArea,
@@ -38,6 +39,7 @@ from windows.app.add_key_dialog import AddKeyDialog
 from windows.core.models import OpenRouterTheme, TrackedKey, WidgetPayload
 from windows.core.service import OpenRouterService
 from windows.core.storage import SharedStorage
+from windows.core.theme import ThemeManager
 from windows.widget.radial_gauge import RadialGauge
 
 
@@ -53,6 +55,7 @@ class KeyListItemWidget(QWidget):
         super().__init__(parent)
         self.key = key
         self.payload = payload
+        self.theme = ThemeManager.get_instance()
         self._init_ui()
 
     def _init_ui(self) -> None:
@@ -61,7 +64,7 @@ class KeyListItemWidget(QWidget):
         layout.setSpacing(10)
 
         # Dot
-        dot_color = OpenRouterTheme.ELECTRIC_BLUE if self.key.is_widget_key else "#71717A"
+        dot_color = OpenRouterTheme.ELECTRIC_BLUE if self.key.is_widget_key else self.theme.text_muted
         self.dot = QLabel("●")
         self.dot.setStyleSheet(f"color: {dot_color}; font-size: 9px;")
         layout.addWidget(self.dot)
@@ -74,7 +77,7 @@ class KeyListItemWidget(QWidget):
         name_row = QHBoxLayout()
         name_row.setSpacing(4)
         lbl_name = QLabel(self.key.custom_label)
-        lbl_name.setStyleSheet("color: #F4F4F5; font-size: 13px; font-weight: 600;")
+        lbl_name.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 13px; font-weight: 600;")
         name_row.addWidget(lbl_name)
 
         if self.key.is_widget_key:
@@ -86,7 +89,7 @@ class KeyListItemWidget(QWidget):
         text_vbox.addLayout(name_row)
 
         lbl_token = QLabel(self.key.key_masked)
-        lbl_token.setStyleSheet("color: #71717A; font-family: Consolas, monospace; font-size: 10px;")
+        lbl_token.setStyleSheet(f"color: {self.theme.text_muted}; font-family: Consolas, monospace; font-size: 10px;")
         text_vbox.addWidget(lbl_token)
 
         layout.addLayout(text_vbox, stretch=1)
@@ -96,10 +99,11 @@ class KeyListItemWidget(QWidget):
             pct = self.payload.usage_percent
             pct_int = int(pct * 100)
             pill_color = OpenRouterTheme.get_gauge_color(pct)
+            bg_col = "rgba(255, 255, 255, 0.08)" if self.theme.is_dark() else "rgba(0, 0, 0, 0.05)"
             pill = QLabel(f"{pct_int}%")
             pill.setStyleSheet(f"""
                 QLabel {{
-                    background-color: rgba(255, 255, 255, 0.08);
+                    background-color: {bg_col};
                     color: {pill_color};
                     font-size: 11px;
                     font-weight: bold;
@@ -122,27 +126,34 @@ class StatCard(QWidget):
         parent: Optional[QWidget] = None,
     ):
         super().__init__(parent)
+        self.theme = ThemeManager.get_instance()
+        self.val_color = val_color
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 10, 12, 10)
         layout.setSpacing(2)
 
-        lbl_title = QLabel(title)
-        lbl_title.setStyleSheet("color: #8C8C96; font-size: 11px; font-weight: 600;")
-        layout.addWidget(lbl_title)
+        self.lbl_title = QLabel(title)
+        layout.addWidget(self.lbl_title)
 
         self.lbl_value = QLabel(value)
-        self.lbl_value.setStyleSheet(f"color: {val_color}; font-size: 17px; font-weight: bold;")
         layout.addWidget(self.lbl_value)
 
-        lbl_sub = QLabel(subtitle)
-        lbl_sub.setStyleSheet("color: #55555C; font-size: 9px;")
-        layout.addWidget(lbl_sub)
+        self.lbl_sub = QLabel(subtitle)
+        layout.addWidget(self.lbl_sub)
 
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #27272A;
+        self.apply_theme()
+
+    def apply_theme(self) -> None:
+        self.lbl_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 11px; font-weight: 600;")
+        self.lbl_value.setStyleSheet(f"color: {self.val_color}; font-size: 17px; font-weight: bold;")
+        self.lbl_sub.setStyleSheet(f"color: {self.theme.text_muted}; font-size: 9px;")
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {self.theme.card_bg};
+                border: 1px solid {self.theme.card_border};
                 border-radius: 8px;
-            }
+            }}
         """)
 
     def set_value(self, value: str) -> None:
@@ -154,23 +165,29 @@ class PeriodPill(QWidget):
 
     def __init__(self, label: str, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        self.theme = ThemeManager.get_instance()
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 10, 12, 10)
         layout.setSpacing(3)
 
-        lbl_title = QLabel(label)
-        lbl_title.setStyleSheet("color: #8C8C96; font-size: 10px;")
-        layout.addWidget(lbl_title)
+        self.lbl_title = QLabel(label)
+        layout.addWidget(self.lbl_title)
 
         self.lbl_val = QLabel("—")
-        self.lbl_val.setStyleSheet("color: #F4F4F5; font-family: Consolas, monospace; font-size: 13px; font-weight: 600;")
         layout.addWidget(self.lbl_val)
 
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #27272A;
+        self.apply_theme()
+
+    def apply_theme(self) -> None:
+        self.lbl_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 10px;")
+        self.lbl_val.setStyleSheet(f"color: {self.theme.text_primary}; font-family: Consolas, monospace; font-size: 13px; font-weight: 600;")
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {self.theme.card_bg};
+                border: 1px solid {self.theme.card_border};
                 border-radius: 8px;
-            }
+            }}
         """)
 
     def set_value(self, val: Optional[float]) -> None:
@@ -198,74 +215,100 @@ class MainWindow(QMainWindow):
         self._is_refreshing: bool = False
         self._is_editing_label: bool = False
 
+        self.theme = ThemeManager.get_instance()
+        self.theme.theme_changed.connect(self._on_theme_changed)
+
         self._init_ui()
         self._key_refreshed.connect(self._on_key_refresh_completed)
         self.load_all_data()
 
     def _init_ui(self) -> None:
-        # Dark modern theme styling
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #18181B;
-                color: #F4F4F5;
-            }
-            QSplitter::handle {
-                background-color: #27272A;
-                width: 1px;
-            }
-            QListWidget {
-                background-color: #18181B;
-                border: none;
-                outline: none;
-            }
-            QListWidget::item {
-                border-radius: 8px;
-                margin: 2px 8px;
-            }
-            QListWidget::item:selected {
-                background-color: #3B82F6;
-            }
-            QListWidget::item:hover:!selected {
-                background-color: #27272A;
-            }
-            QScrollArea {
-                background-color: #18181B;
-                border: none;
-            }
-            QPushButton {
-                background-color: #27272A;
-                color: #F4F4F5;
-                border: 1px solid #3F3F46;
-                border-radius: 6px;
-                padding: 6px 12px;
-                font-weight: 600;
-            }
-            QPushButton:hover {
-                background-color: #3F3F46;
-            }
-        """)
-
-        splitter = QSplitter(Qt.Orientation.Horizontal, self)
-        self.setCentralWidget(splitter)
+        self.splitter = QSplitter(Qt.Orientation.Horizontal, self)
+        self.setCentralWidget(self.splitter)
 
         # 1. Left Sidebar
-        sidebar = QWidget()
-        sidebar.setFixedWidth(270)
-        sidebar.setStyleSheet("background-color: #18181B; border-right: 1px solid #27272A;")
-        sidebar_layout = QVBoxLayout(sidebar)
+        self.sidebar = QWidget()
+        self.sidebar.setFixedWidth(270)
+        sidebar_layout = QVBoxLayout(self.sidebar)
         sidebar_layout.setContentsMargins(12, 16, 12, 16)
         sidebar_layout.setSpacing(12)
 
-        lbl_section = QLabel("TRACKED KEYS")
-        lbl_section.setStyleSheet("color: #71717A; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;")
-        sidebar_layout.addWidget(lbl_section)
+        self.lbl_section = QLabel("TRACKED KEYS")
+        sidebar_layout.addWidget(self.lbl_section)
 
         self.list_keys = QListWidget()
         self.list_keys.currentRowChanged.connect(self._on_key_selected)
         sidebar_layout.addWidget(self.list_keys, stretch=1)
 
-        btn_add = QPushButton("＋ Add API Key")
-        btn_add.setStyleSheet("""
+        self.btn_add = QPushButton("＋ Add API Key")
+        self.btn_add.clicked.connect(self._open_add_key_dialog)
+        sidebar_layout.addWidget(self.btn_add)
+
+        self.splitter.addWidget(self.sidebar)
+
+        # 2. Right Detail Panel
+        self.detail_stack = QStackedWidget()
+        self._build_empty_view()
+        self._build_detail_view()
+        self.splitter.addWidget(self.detail_stack)
+
+        self._apply_theme_styles()
+
+    def _apply_theme_styles(self) -> None:
+        is_dark = self.theme.is_dark()
+        bg = self.theme.bg_color
+        text = self.theme.text_primary
+        muted = self.theme.text_muted
+        sec = self.theme.text_secondary
+        sb_bg = self.theme.sidebar_bg
+        sb_border = self.theme.sidebar_border
+
+        self.setStyleSheet(f"""
+            QMainWindow {{
+                background-color: {bg};
+                color: {text};
+            }}
+            QSplitter::handle {{
+                background-color: {sb_border};
+                width: 1px;
+            }}
+            QListWidget {{
+                background-color: {sb_bg};
+                border: none;
+                outline: none;
+            }}
+            QListWidget::item {{
+                border-radius: 8px;
+                margin: 2px 8px;
+            }}
+            QListWidget::item:selected {{
+                background-color: #3B82F6;
+                color: #FFFFFF;
+            }}
+            QListWidget::item:hover:!selected {{
+                background-color: {'#27272A' if is_dark else '#E2E8F0'};
+            }}
+            QScrollArea {{
+                background-color: {bg};
+                border: none;
+            }}
+            QPushButton {{
+                background-color: {'#27272A' if is_dark else '#FFFFFF'};
+                color: {text};
+                border: 1px solid {'#3F3F46' if is_dark else '#CBD5E1'};
+                border-radius: 6px;
+                padding: 6px 12px;
+                font-weight: 600;
+            }}
+            QPushButton:hover {{
+                background-color: {'#3F3F46' if is_dark else '#F1F5F9'};
+            }}
+        """)
+
+        self.sidebar.setStyleSheet(f"background-color: {sb_bg}; border-right: 1px solid {sb_border};")
+        self.lbl_section.setStyleSheet(f"color: {muted}; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;")
+
+        self.btn_add.setStyleSheet("""
             QPushButton {
                 background-color: rgba(59, 130, 246, 0.12);
                 color: #3B82F6;
@@ -279,16 +322,42 @@ class MainWindow(QMainWindow):
                 background-color: rgba(59, 130, 246, 0.22);
             }
         """)
-        btn_add.clicked.connect(self._open_add_key_dialog)
-        sidebar_layout.addWidget(btn_add)
 
-        splitter.addWidget(sidebar)
+        if hasattr(self, "card_spend"):
+            self.card_spend.apply_theme()
+            self.card_rem.apply_theme()
+            self.card_limit.apply_theme()
+            self.pill_today.apply_theme()
+            self.pill_week.apply_theme()
+            self.pill_month.apply_theme()
 
-        # 2. Right Detail Panel
-        self.detail_stack = QStackedWidget()
-        self._build_empty_view()
-        self._build_detail_view()
-        splitter.addWidget(self.detail_stack)
+        if hasattr(self, "budget_card"):
+            self.budget_card.setStyleSheet(f"""
+                QWidget {{
+                    background-color: {self.theme.card_bg};
+                    border: 1px solid {self.theme.card_border};
+                    border-radius: 12px;
+                }}
+            """)
+
+        if hasattr(self, "acct_card"):
+            acct_border = "rgba(59, 130, 246, 0.20)" if is_dark else "rgba(59, 130, 246, 0.25)"
+            self.acct_card.setStyleSheet(f"""
+                QWidget {{
+                    background-color: rgba(59, 130, 246, 0.06);
+                    border: 1px solid {acct_border};
+                    border-radius: 12px;
+                }}
+            """)
+
+        if hasattr(self, "btn_theme"):
+            if self.theme.mode == "light":
+                theme_icon = "☀️ Light"
+            elif self.theme.mode == "dark":
+                theme_icon = "🌙 Dark"
+            else:
+                theme_icon = "💻 System"
+            self.btn_theme.setText(theme_icon)
 
     def _build_empty_view(self) -> None:
         empty_widget = QWidget()
@@ -301,11 +370,11 @@ class MainWindow(QMainWindow):
         layout.addWidget(icon_lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
         title = QLabel("No API Keys Added")
-        title.setStyleSheet("font-size: 18px; font-weight: bold; color: #FFFFFF;")
+        title.setStyleSheet(f"font-size: 18px; font-weight: bold; color: {self.theme.text_primary};")
         layout.addWidget(title, alignment=Qt.AlignmentFlag.AlignCenter)
 
         sub = QLabel("Add your OpenRouter key to track usage, balance, and desktop widgets.")
-        sub.setStyleSheet("color: #71717A; font-size: 13px;")
+        sub.setStyleSheet(f"color: {self.theme.text_muted}; font-size: 13px;")
         layout.addWidget(sub, alignment=Qt.AlignmentFlag.AlignCenter)
 
         btn_first = QPushButton("Add Your First Key")
@@ -336,13 +405,8 @@ class MainWindow(QMainWindow):
         self.detail_layout.setContentsMargins(28, 24, 28, 24)
         self.detail_layout.setSpacing(22)
 
-        # Header Card
         self._build_header_card()
-
-        # Primary Key Budget Section
         self._build_budget_section()
-
-        # Secondary Account Overview Section
         self._build_account_section()
 
         self.detail_layout.addStretch()
@@ -353,7 +417,6 @@ class MainWindow(QMainWindow):
         header_hbox = QHBoxLayout()
         header_hbox.setSpacing(12)
 
-        # Left title & edit
         left_vbox = QVBoxLayout()
         left_vbox.setSpacing(4)
 
@@ -361,19 +424,19 @@ class MainWindow(QMainWindow):
         edit_row.setSpacing(8)
 
         self.lbl_key_name = QLabel("API Key")
-        self.lbl_key_name.setStyleSheet("font-size: 22px; font-weight: bold; color: #FFFFFF;")
+        self.lbl_key_name.setStyleSheet(f"font-size: 22px; font-weight: bold; color: {self.theme.text_primary};")
         edit_row.addWidget(self.lbl_key_name)
 
         self.txt_edit_name = QLineEdit()
-        self.txt_edit_name.setStyleSheet("""
-            QLineEdit {
-                background-color: #27272A;
-                color: #FFFFFF;
+        self.txt_edit_name.setStyleSheet(f"""
+            QLineEdit {{
+                background-color: {self.theme.card_bg};
+                color: {self.theme.text_primary};
                 border: 1px solid #3B82F6;
                 border-radius: 4px;
                 padding: 3px 8px;
                 font-size: 15px;
-            }
+            }}
         """)
         self.txt_edit_name.hide()
         edit_row.addWidget(self.txt_edit_name)
@@ -396,7 +459,7 @@ class MainWindow(QMainWindow):
         sub_row = QHBoxLayout()
         sub_row.setSpacing(8)
         self.lbl_masked_token = QLabel("Token: ••••••••")
-        self.lbl_masked_token.setStyleSheet("color: #71717A; font-family: Consolas, monospace; font-size: 12px;")
+        self.lbl_masked_token.setStyleSheet(f"color: {self.theme.text_muted}; font-family: Consolas, monospace; font-size: 12px;")
         sub_row.addWidget(self.lbl_masked_token)
 
         self.lbl_pinned_badge = QLabel("✓ Active on Desktop Widget")
@@ -410,6 +473,12 @@ class MainWindow(QMainWindow):
         # Right Action Buttons
         actions_hbox = QHBoxLayout()
         actions_hbox.setSpacing(8)
+
+        # Theme Switcher Button
+        self.btn_theme = QPushButton("💻 System")
+        self.btn_theme.setToolTip("Switch Theme (System / Dark / Light)")
+        self.btn_theme.clicked.connect(self._cycle_theme)
+        actions_hbox.addWidget(self.btn_theme)
 
         self.btn_pin = QPushButton("Pin to Widget")
         self.btn_pin.clicked.connect(self._toggle_pin_widget)
@@ -428,7 +497,6 @@ class MainWindow(QMainWindow):
         header_hbox.addLayout(actions_hbox)
         self.detail_layout.addLayout(header_hbox)
 
-        # Error banner
         self.lbl_error_banner = QLabel()
         self.lbl_error_banner.setStyleSheet("""
             background-color: rgba(239, 68, 68, 0.12);
@@ -441,31 +509,33 @@ class MainWindow(QMainWindow):
         self.lbl_error_banner.hide()
         self.detail_layout.addWidget(self.lbl_error_banner)
 
+    def _cycle_theme(self) -> None:
+        order = ["system", "light", "dark"]
+        curr_idx = order.index(self.theme.mode) if self.theme.mode in order else 0
+        next_mode = order[(curr_idx + 1) % len(order)]
+        self.theme.set_mode(next_mode)
+
     def _build_budget_section(self) -> None:
         sec_header = QHBoxLayout()
         lbl_title = QLabel("Key Budget & Usage")
-        lbl_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #F4F4F5;")
+        lbl_title.setStyleSheet(f"font-size: 16px; font-weight: bold; color: {self.theme.text_primary};")
         sec_header.addWidget(lbl_title)
         sec_header.addStretch()
 
         self.lbl_last_updated = QLabel("Updated just now")
-        self.lbl_last_updated.setStyleSheet("color: #71717A; font-size: 11px;")
+        self.lbl_last_updated.setStyleSheet(f"color: {self.theme.text_muted}; font-size: 11px;")
         sec_header.addWidget(self.lbl_last_updated)
         self.detail_layout.addLayout(sec_header)
 
-        # Visual Gauge + Numbers Card
-        budget_card = QWidget()
-        budget_card.setStyleSheet("background-color: #202024; border-radius: 12px;")
-        card_layout = QHBoxLayout(budget_card)
+        self.budget_card = QWidget()
+        card_layout = QHBoxLayout(self.budget_card)
         card_layout.setContentsMargins(18, 16, 18, 16)
         card_layout.setSpacing(24)
 
-        # Gauge
         self.detail_gauge = RadialGauge(stroke_width=11.0)
         self.detail_gauge.setFixedSize(116, 116)
         card_layout.addWidget(self.detail_gauge)
 
-        # Stats Grid
         stats_vbox = QVBoxLayout()
         stats_vbox.setSpacing(10)
         stats_row = QHBoxLayout()
@@ -481,9 +551,8 @@ class MainWindow(QMainWindow):
         stats_vbox.addLayout(stats_row)
 
         card_layout.addLayout(stats_vbox, stretch=1)
-        self.detail_layout.addWidget(budget_card)
+        self.detail_layout.addWidget(self.budget_card)
 
-        # Periodic Spend Breakdown Pills
         period_row = QHBoxLayout()
         period_row.setSpacing(12)
         self.pill_today = PeriodPill("Today's Spend")
@@ -497,18 +566,11 @@ class MainWindow(QMainWindow):
 
     def _build_account_section(self) -> None:
         lbl_sec2 = QLabel("Account Overview (Shared Balance)")
-        lbl_sec2.setStyleSheet("font-size: 15px; font-weight: bold; color: #A1A1AA; margin-top: 8px;")
+        lbl_sec2.setStyleSheet(f"font-size: 15px; font-weight: bold; color: {self.theme.text_secondary}; margin-top: 8px;")
         self.detail_layout.addWidget(lbl_sec2)
 
-        acct_card = QWidget()
-        acct_card.setStyleSheet(f"""
-            QWidget {{
-                background-color: rgba(59, 130, 246, 0.05);
-                border: 1px solid rgba(59, 130, 246, 0.18);
-                border-radius: 12px;
-            }}
-        """)
-        acct_layout = QVBoxLayout(acct_card)
+        self.acct_card = QWidget()
+        acct_layout = QVBoxLayout(self.acct_card)
         acct_layout.setContentsMargins(18, 16, 18, 16)
         acct_layout.setSpacing(14)
 
@@ -516,7 +578,7 @@ class MainWindow(QMainWindow):
         bal_vbox = QVBoxLayout()
         bal_vbox.setSpacing(2)
         lbl_bal_caption = QLabel("Available Account Balance")
-        lbl_bal_caption.setStyleSheet("color: #8C8C96; font-size: 12px; border: none; background: transparent;")
+        lbl_bal_caption.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 12px; border: none; background: transparent;")
         self.lbl_acct_bal = QLabel("$0.00")
         self.lbl_acct_bal.setStyleSheet(f"color: {OpenRouterTheme.ELECTRIC_BLUE}; font-size: 26px; font-weight: bold; border: none; background: transparent;")
         bal_vbox.addWidget(lbl_bal_caption)
@@ -530,9 +592,9 @@ class MainWindow(QMainWindow):
         tot_vbox = QVBoxLayout()
         tot_vbox.setSpacing(2)
         lbl_tot_cap = QLabel("Total Purchased")
-        lbl_tot_cap.setStyleSheet("color: #8C8C96; font-size: 11px; border: none; background: transparent;")
+        lbl_tot_cap.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 11px; border: none; background: transparent;")
         self.lbl_acct_total = QLabel("$0.00")
-        self.lbl_acct_total.setStyleSheet("color: #F4F4F5; font-size: 15px; font-family: Consolas, monospace; font-weight: 600; border: none; background: transparent;")
+        self.lbl_acct_total.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 15px; font-family: Consolas, monospace; font-weight: 600; border: none; background: transparent;")
         tot_vbox.addWidget(lbl_tot_cap)
         tot_vbox.addWidget(self.lbl_acct_total)
         totals_hbox.addLayout(tot_vbox)
@@ -540,9 +602,9 @@ class MainWindow(QMainWindow):
         burn_vbox = QVBoxLayout()
         burn_vbox.setSpacing(2)
         lbl_burn_cap = QLabel("Account Burn")
-        lbl_burn_cap.setStyleSheet("color: #8C8C96; font-size: 11px; border: none; background: transparent;")
+        lbl_burn_cap.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 11px; border: none; background: transparent;")
         self.lbl_acct_burn = QLabel("$0.00")
-        self.lbl_acct_burn.setStyleSheet("color: #F4F4F5; font-size: 15px; font-family: Consolas, monospace; font-weight: 600; border: none; background: transparent;")
+        self.lbl_acct_burn.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 15px; font-family: Consolas, monospace; font-weight: 600; border: none; background: transparent;")
         burn_vbox.addWidget(lbl_burn_cap)
         burn_vbox.addWidget(self.lbl_acct_burn)
         totals_hbox.addLayout(burn_vbox)
@@ -550,7 +612,6 @@ class MainWindow(QMainWindow):
         top_row.addLayout(totals_hbox)
         acct_layout.addLayout(top_row)
 
-        # Progress bar
         self.account_bar = QWidget()
         self.account_bar.setFixedHeight(6)
         self.account_bar.setStyleSheet("background: transparent; border: none;")
@@ -558,17 +619,19 @@ class MainWindow(QMainWindow):
 
         sub_stats = QHBoxLayout()
         self.lbl_bar_stat1 = QLabel("Total used: $0.00 (0%)")
-        self.lbl_bar_stat1.setStyleSheet("color: #71717A; font-size: 11px; border: none; background: transparent;")
+        self.lbl_bar_stat1.setStyleSheet(f"color: {self.theme.text_muted}; font-size: 11px; border: none; background: transparent;")
         self.lbl_bar_stat2 = QLabel("Credits pool: $0.00")
-        self.lbl_bar_stat2.setStyleSheet("color: #71717A; font-size: 11px; border: none; background: transparent;")
+        self.lbl_bar_stat2.setStyleSheet(f"color: {self.theme.text_muted}; font-size: 11px; border: none; background: transparent;")
         sub_stats.addWidget(self.lbl_bar_stat1)
         sub_stats.addStretch()
         sub_stats.addWidget(self.lbl_bar_stat2)
         acct_layout.addLayout(sub_stats)
 
-        self.detail_layout.addWidget(acct_card)
+        self.detail_layout.addWidget(self.acct_card)
 
-    # MARK: - Data Loading & Key Selection
+    def _on_theme_changed(self) -> None:
+        self._apply_theme_styles()
+        self.load_all_data()
 
     def load_all_data(self) -> None:
         self.keys = SharedStorage.load_all_keys()
@@ -589,7 +652,6 @@ class MainWindow(QMainWindow):
             self.selected_key_id = None
         else:
             self.detail_stack.setCurrentIndex(1)
-            # Find widget key or select first
             widget_idx = next((i for i, k in enumerate(self.keys) if k.is_widget_key), 0)
             self.list_keys.setCurrentRow(widget_idx)
 
@@ -663,8 +725,6 @@ class MainWindow(QMainWindow):
         self.lbl_bar_stat2.setText(f"Credits pool: ${payload.total_credits:.2f}")
 
         self.update()
-
-    # MARK: - Actions
 
     def _open_add_key_dialog(self) -> None:
         dlg = AddKeyDialog(self)

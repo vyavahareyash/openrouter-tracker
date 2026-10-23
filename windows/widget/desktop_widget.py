@@ -1,4 +1,4 @@
-"""Windows Desktop Widget with Small & Medium layouts, frameless drag, and 1-click refresh."""
+"""Windows Desktop Widget with Small & Medium layouts, frameless drag, 1-click refresh, and Light/Dark themes."""
 
 from __future__ import annotations
 
@@ -30,6 +30,7 @@ from PySide6.QtWidgets import (
 from windows.core.models import OpenRouterTheme, TrackedKey, WidgetPayload
 from windows.core.service import OpenRouterService
 from windows.core.storage import SharedStorage
+from windows.core.theme import ThemeManager
 from windows.widget.radial_gauge import RadialGauge
 
 
@@ -41,27 +42,54 @@ class RefreshButton(QPushButton):
         self.setFixedSize(22, 22)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip("Refresh OpenRouter balance now")
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: rgba(150, 150, 150, 0.15);
-                color: #A1A1AA;
-                border: none;
-                border-radius: 11px;
-                font-size: 11px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: rgba(59, 130, 246, 0.35);
-                color: #FFFFFF;
-            }
-            QPushButton:pressed {
-                background-color: rgba(59, 130, 246, 0.60);
-            }
-            QPushButton:disabled {
-                color: #555555;
-                background-color: transparent;
-            }
-        """)
+        self.theme = ThemeManager.get_instance()
+        self.apply_theme()
+
+    def apply_theme(self) -> None:
+        if self.theme.is_dark():
+            self.setStyleSheet("""
+                QPushButton {
+                    background-color: rgba(150, 150, 150, 0.15);
+                    color: #A1A1AA;
+                    border: none;
+                    border-radius: 11px;
+                    font-size: 11px;
+                    font-weight: bold;
+                }
+                QPushButton:hover {
+                    background-color: rgba(59, 130, 246, 0.35);
+                    color: #FFFFFF;
+                }
+                QPushButton:pressed {
+                    background-color: rgba(59, 130, 246, 0.60);
+                }
+                QPushButton:disabled {
+                    color: #555555;
+                    background-color: transparent;
+                }
+            """)
+        else:
+            self.setStyleSheet("""
+                QPushButton {
+                    background-color: rgba(0, 0, 0, 0.06);
+                    color: #64748B;
+                    border: none;
+                    border-radius: 11px;
+                    font-size: 11px;
+                    font-weight: bold;
+                }
+                QPushButton:hover {
+                    background-color: rgba(59, 130, 246, 0.20);
+                    color: #1E40AF;
+                }
+                QPushButton:pressed {
+                    background-color: rgba(59, 130, 246, 0.40);
+                }
+                QPushButton:disabled {
+                    color: #CBD5E1;
+                    background-color: transparent;
+                }
+            """)
 
 
 class DesktopWidget(QWidget):
@@ -80,6 +108,8 @@ class DesktopWidget(QWidget):
         self.mode: str = SharedStorage.get_setting("widget_mode", "medium")
         self.pinned_to_desktop: bool = SharedStorage.get_setting("widget_pinned_to_desktop", False)
         self.always_on_top: bool = SharedStorage.get_setting("widget_always_on_top", False)
+        self.theme = ThemeManager.get_instance()
+        self.theme.theme_changed.connect(self._on_theme_changed)
 
         self._init_window()
         self._init_ui()
@@ -90,7 +120,6 @@ class DesktopWidget(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self._update_window_flags()
 
-        # Restore geometry if saved
         saved_x = SharedStorage.get_setting("widget_x")
         saved_y = SharedStorage.get_setting("widget_y")
         if saved_x is not None and saved_y is not None:
@@ -111,12 +140,10 @@ class DesktopWidget(QWidget):
         self.setWindowFlags(flags)
 
     def _init_ui(self) -> None:
-        # Root layout with padding
         self.root_layout = QVBoxLayout(self)
         self.root_layout.setContentsMargins(10, 10, 10, 10)
         self.root_layout.setSpacing(0)
 
-        # Container card
         self.card = QWidget(self)
         self.card.setObjectName("widgetCard")
         self.card_layout = QVBoxLayout(self.card)
@@ -127,7 +154,6 @@ class DesktopWidget(QWidget):
         self._build_content()
 
     def _build_content(self) -> None:
-        # Clear existing layout
         while self.card_layout.count():
             item = self.card_layout.takeAt(0)
             widget = item.widget()
@@ -140,7 +166,6 @@ class DesktopWidget(QWidget):
             self._build_small_layout()
 
     def _build_small_layout(self) -> None:
-        # Header: Nickname + Refresh
         header = QHBoxLayout()
         header.setContentsMargins(0, 0, 0, 0)
         header.setSpacing(4)
@@ -150,7 +175,7 @@ class DesktopWidget(QWidget):
         header.addWidget(dot)
 
         self.lbl_nickname = QLabel("OpenRouter")
-        self.lbl_nickname.setStyleSheet("color: #F4F4F5; font-size: 11px; font-weight: bold;")
+        self.lbl_nickname.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 11px; font-weight: bold;")
         self.lbl_nickname.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         header.addWidget(self.lbl_nickname)
 
@@ -159,7 +184,6 @@ class DesktopWidget(QWidget):
         header.addWidget(self.btn_refresh)
         self.card_layout.addLayout(header)
 
-        # Center Gauge
         self.radial_gauge = RadialGauge(stroke_width=7.5)
         self.radial_gauge.setFixedSize(110, 110)
         gauge_container = QHBoxLayout()
@@ -178,7 +202,6 @@ class DesktopWidget(QWidget):
         left_vbox.setContentsMargins(0, 0, 0, 0)
         left_vbox.setSpacing(4)
 
-        # Key Header
         key_header = QHBoxLayout()
         key_header.setSpacing(4)
         dot = QLabel("●")
@@ -186,18 +209,17 @@ class DesktopWidget(QWidget):
         key_header.addWidget(dot)
 
         self.lbl_nickname = QLabel("OpenRouter")
-        self.lbl_nickname.setStyleSheet("color: #F4F4F5; font-size: 11px; font-weight: bold;")
+        self.lbl_nickname.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 11px; font-weight: bold;")
         key_header.addWidget(self.lbl_nickname)
         key_header.addStretch()
         left_vbox.addLayout(key_header)
 
         self.lbl_masked = QLabel("••••••••")
-        self.lbl_masked.setStyleSheet("color: #71717A; font-family: Consolas, monospace; font-size: 8px;")
+        self.lbl_masked.setStyleSheet(f"color: {self.theme.text_muted}; font-family: Consolas, monospace; font-size: 8px;")
         left_vbox.addWidget(self.lbl_masked)
 
         left_vbox.addSpacing(2)
 
-        # Gauge + Spent/Limit Stats Row
         gauge_row = QHBoxLayout()
         gauge_row.setContentsMargins(0, 0, 0, 0)
         gauge_row.setSpacing(8)
@@ -211,12 +233,12 @@ class DesktopWidget(QWidget):
         stats_vbox.setSpacing(4)
 
         lbl_spent_title = QLabel("SPENT")
-        lbl_spent_title.setStyleSheet("color: #8C8C96; font-size: 7px; font-weight: bold;")
+        lbl_spent_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7px; font-weight: bold;")
         self.lbl_spent_val = QLabel("$0.00")
         self.lbl_spent_val.setStyleSheet(f"color: {OpenRouterTheme.NEON_VIOLET}; font-size: 11px; font-weight: bold;")
 
         lbl_limit_title = QLabel("LIMIT")
-        lbl_limit_title.setStyleSheet("color: #8C8C96; font-size: 7px; font-weight: bold;")
+        lbl_limit_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7px; font-weight: bold;")
         self.lbl_limit_val = QLabel("Unlimited")
         self.lbl_limit_val.setStyleSheet(f"color: {OpenRouterTheme.AMBER_WARNING}; font-size: 11px; font-weight: bold;")
 
@@ -232,20 +254,22 @@ class DesktopWidget(QWidget):
         left_vbox.addStretch()
         main_hbox.addLayout(left_vbox, stretch=3)
 
-        # Vertical Divider
+        # Divider
         divider = QFrame()
         divider.setFrameShape(QFrame.Shape.VLine)
-        divider.setStyleSheet("color: rgba(255, 255, 255, 0.12);")
+        div_color = "rgba(255, 255, 255, 0.12)" if self.theme.is_dark() else "rgba(0, 0, 0, 0.08)"
+        divider.setStyleSheet(f"color: {div_color};")
         main_hbox.addWidget(divider)
 
         # Right Column: Account Overview Card
         right_card = QWidget()
-        right_card.setStyleSheet("""
-            QWidget {
+        border_col = "rgba(59, 130, 246, 0.18)" if self.theme.is_dark() else "rgba(59, 130, 246, 0.22)"
+        right_card.setStyleSheet(f"""
+            QWidget {{
                 background-color: rgba(59, 130, 246, 0.08);
-                border: 1px solid rgba(59, 130, 246, 0.18);
+                border: 1px solid {border_col};
                 border-radius: 8px;
-            }
+            }}
         """)
         right_vbox = QVBoxLayout(right_card)
         right_vbox.setContentsMargins(8, 6, 8, 6)
@@ -253,7 +277,7 @@ class DesktopWidget(QWidget):
 
         acct_header = QHBoxLayout()
         lbl_acct_title = QLabel("Account Total")
-        lbl_acct_title.setStyleSheet("color: #A1A1AA; font-size: 9px; font-weight: 600; border: none; background: transparent;")
+        lbl_acct_title.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 9px; font-weight: 600; border: none; background: transparent;")
         acct_header.addWidget(lbl_acct_title)
         acct_header.addStretch()
 
@@ -263,14 +287,13 @@ class DesktopWidget(QWidget):
         right_vbox.addLayout(acct_header)
 
         lbl_bal_caption = QLabel("Available Balance")
-        lbl_bal_caption.setStyleSheet("color: #8C8C96; font-size: 8px; border: none; background: transparent;")
+        lbl_bal_caption.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 8px; border: none; background: transparent;")
         right_vbox.addWidget(lbl_bal_caption)
 
         self.lbl_acct_balance = QLabel("$0.00")
         self.lbl_acct_balance.setStyleSheet(f"color: {OpenRouterTheme.ELECTRIC_BLUE}; font-size: 15px; font-weight: bold; border: none; background: transparent;")
         right_vbox.addWidget(self.lbl_acct_balance)
 
-        # Account Burn Bar
         self.burn_bar = QWidget()
         self.burn_bar.setFixedHeight(4)
         self.burn_bar.setStyleSheet("background: transparent; border: none;")
@@ -279,9 +302,9 @@ class DesktopWidget(QWidget):
         burn_stats = QHBoxLayout()
         burn_stats.setContentsMargins(0, 0, 0, 0)
         self.lbl_burn_used = QLabel("Used $0")
-        self.lbl_burn_used.setStyleSheet("color: #8C8C96; font-size: 7.5px; border: none; background: transparent;")
+        self.lbl_burn_used.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7.5px; border: none; background: transparent;")
         self.lbl_burn_total = QLabel("Total $0")
-        self.lbl_burn_total.setStyleSheet("color: #8C8C96; font-size: 7.5px; border: none; background: transparent;")
+        self.lbl_burn_total.setStyleSheet(f"color: {self.theme.text_secondary}; font-size: 7.5px; border: none; background: transparent;")
         burn_stats.addWidget(self.lbl_burn_used)
         burn_stats.addStretch()
         burn_stats.addWidget(self.lbl_burn_total)
@@ -290,14 +313,17 @@ class DesktopWidget(QWidget):
         right_vbox.addStretch()
 
         self.lbl_updated = QLabel("Updated just now")
-        self.lbl_updated.setStyleSheet("color: #71717A; font-size: 7px; border: none; background: transparent;")
+        self.lbl_updated.setStyleSheet(f"color: {self.theme.text_muted}; font-size: 7px; border: none; background: transparent;")
         self.lbl_updated.setAlignment(Qt.AlignmentFlag.AlignRight)
         right_vbox.addWidget(self.lbl_updated)
 
         main_hbox.addWidget(right_card, stretch=2)
         self.card_layout.addLayout(main_hbox)
 
-    # MARK: - Data Loading & Rendering
+    def _on_theme_changed(self) -> None:
+        self._build_content()
+        self.load_data()
+        self.update()
 
     def load_data(self) -> None:
         payload = SharedStorage.get_widget_payload()
@@ -339,8 +365,6 @@ class DesktopWidget(QWidget):
 
         self.update()
 
-    # MARK: - Interactive Tactile 1-Click Refresh
-
     def trigger_refresh(self) -> None:
         if self._is_refreshing:
             return
@@ -368,8 +392,6 @@ class DesktopWidget(QWidget):
             self.btn_refresh.setText("🔄")
         self.apply_payload(payload)
 
-    # MARK: - Mode Switching
-
     def set_mode(self, mode: str) -> None:
         if mode not in ("small", "medium"):
             return
@@ -379,8 +401,6 @@ class DesktopWidget(QWidget):
         self.setFixedSize(target_size)
         self._build_content()
         self.load_data()
-
-    # MARK: - Window Dragging & Coordinates Persistence
 
     def mousePressEvent(self, event) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
@@ -406,31 +426,32 @@ class DesktopWidget(QWidget):
         else:
             super().mouseReleaseEvent(event)
 
-    # MARK: - Right-Click Context Menu
-
     def contextMenuEvent(self, event) -> None:
         menu = QMenu(self)
-        menu.setStyleSheet("""
-            QMenu {
-                background-color: #27272A;
-                color: #F4F4F5;
-                border: 1px solid #3F3F46;
+        menu_bg = "#27272A" if self.theme.is_dark() else "#FFFFFF"
+        menu_text = "#F4F4F5" if self.theme.is_dark() else "#0F172A"
+        menu_border = "#3F3F46" if self.theme.is_dark() else "#E2E8F0"
+        menu.setStyleSheet(f"""
+            QMenu {{
+                background-color: {menu_bg};
+                color: {menu_text};
+                border: 1px solid {menu_border};
                 border-radius: 8px;
                 padding: 4px;
-            }
-            QMenu::item {
+            }}
+            QMenu::item {{
                 padding: 6px 20px;
                 border-radius: 4px;
-            }
-            QMenu::item:selected {
+            }}
+            QMenu::item:selected {{
                 background-color: #3B82F6;
                 color: #FFFFFF;
-            }
-            QMenu::separator {
+            }}
+            QMenu::separator {{
                 height: 1px;
-                background-color: #3F3F46;
+                background-color: {menu_border};
                 margin: 4px 6px;
-            }
+            }}
         """)
 
         # Refresh
@@ -465,6 +486,26 @@ class DesktopWidget(QWidget):
 
         menu.addSeparator()
 
+        # Theme Submenu
+        theme_menu = menu.addMenu("🎨 Theme")
+        theme_menu.setStyleSheet(menu.styleSheet())
+        act_sys = theme_menu.addAction("💻 System Default")
+        act_sys.setCheckable(True)
+        act_sys.setChecked(self.theme.mode == "system")
+        act_sys.triggered.connect(lambda: self.theme.set_mode("system"))
+
+        act_dark = theme_menu.addAction("🌙 Dark Mode")
+        act_dark.setCheckable(True)
+        act_dark.setChecked(self.theme.mode == "dark")
+        act_dark.triggered.connect(lambda: self.theme.set_mode("dark"))
+
+        act_light = theme_menu.addAction("☀️ Light Mode")
+        act_light.setCheckable(True)
+        act_light.setChecked(self.theme.mode == "light")
+        act_light.triggered.connect(lambda: self.theme.set_mode("light"))
+
+        menu.addSeparator()
+
         # Open Companion App
         act_companion = menu.addAction("🖥️ Open Companion App")
         act_companion.triggered.connect(self.open_companion_requested.emit)
@@ -492,31 +533,26 @@ class DesktopWidget(QWidget):
 
         menu.exec(event.globalPos())
 
-    # MARK: - Custom Card Painting
-
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # Outer bounding card
         margin = 6
         rect = QRectF(margin, margin, self.width() - 2 * margin, self.height() - 2 * margin)
 
         path = QPainterPath()
         path.addRoundedRect(rect, 14, 14)
 
-        # Dark sleek background
-        painter.fillPath(path, QColor("#1C1C20"))
+        # Dynamic card background
+        painter.fillPath(path, self.theme.widget_bg_qcolor)
 
         # Subtle border
-        border_pen = QPen(QColor(255, 255, 255, 22), 1)
+        border_pen = QPen(self.theme.widget_border_qcolor, 1)
         painter.setPen(border_pen)
         painter.drawPath(path)
 
-        # Paint medium burn progress bar if present
+        # Paint medium burn progress bar
         if self.mode == "medium" and hasattr(self, "burn_bar") and hasattr(self, "current_payload"):
-            burn_rect = self.burn_bar.geometry()
-            # Convert to self coordinates
             burn_global = self.burn_bar.mapTo(self, QPoint(0, 0))
             bx = burn_global.x()
             by = burn_global.y()
@@ -526,7 +562,7 @@ class DesktopWidget(QWidget):
             if bw > 0:
                 track_path = QPainterPath()
                 track_path.addRoundedRect(QRectF(bx, by, bw, bh), bh / 2.0, bh / 2.0)
-                painter.fillPath(track_path, QColor(255, 255, 255, 25))
+                painter.fillPath(track_path, self.theme.burn_track_qcolor)
 
                 burn_pct = self.current_payload.account_burn_percent
                 if burn_pct > 0.0:

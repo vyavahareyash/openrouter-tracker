@@ -243,5 +243,36 @@ class TestUIComponents(unittest.TestCase):
         self.assertIn("Verified", dlg.lbl_status.text())
 
 
+class TestThemeManager(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = Path(tempfile.mkdtemp(prefix="ort_theme_test_"))
+        self.old_custom = SharedStorage.custom_storage_directory
+        SharedStorage.custom_storage_directory = self.temp_dir
+
+    def tearDown(self):
+        SharedStorage.custom_storage_directory = self.old_custom
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def test_theme_mode_switching_and_colors(self):
+        from windows.core.theme import ThemeManager
+        theme = ThemeManager.get_instance()
+
+        # Switch to dark
+        theme.set_mode("dark")
+        self.assertEqual(theme.mode, "dark")
+        self.assertTrue(theme.is_dark())
+        self.assertEqual(theme.bg_color, "#18181B")
+        self.assertEqual(theme.card_bg, "#202024")
+        self.assertEqual(theme.text_primary, "#F4F4F5")
+
+        # Switch to light
+        theme.set_mode("light")
+        self.assertEqual(theme.mode, "light")
+        self.assertFalse(theme.is_dark())
+        self.assertEqual(theme.bg_color, "#F8FAFC")
+        self.assertEqual(theme.card_bg, "#FFFFFF")
+        self.assertEqual(theme.text_primary, "#0F172A")
+
+
 if __name__ == "__main__":
     unittest.main()

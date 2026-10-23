@@ -9,13 +9,13 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (
     QColor,
     QFont,
-    QLinearGradient,
     QPainter,
     QPen,
 )
 from PySide6.QtWidgets import QWidget
 
 from windows.core.models import OpenRouterTheme, WidgetPayload
+from windows.core.theme import ThemeManager
 
 
 class RadialGauge(QWidget):
@@ -29,6 +29,8 @@ class RadialGauge(QWidget):
         super().__init__(parent)
         self.stroke_width = stroke_width
         self.payload: Optional[WidgetPayload] = None
+        self.theme = ThemeManager.get_instance()
+        self.theme.theme_changed.connect(self.update)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def set_payload(self, payload: WidgetPayload) -> None:
@@ -61,7 +63,7 @@ class RadialGauge(QWidget):
             return
 
         # 1. Background Track
-        track_pen = QPen(QColor(150, 150, 150, 45), self.stroke_width)
+        track_pen = QPen(self.theme.gauge_track_qcolor, self.stroke_width)
         track_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(track_pen)
         painter.drawEllipse(rect)
@@ -74,7 +76,6 @@ class RadialGauge(QWidget):
             arc_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
             painter.setPen(arc_pen)
 
-            # Qt angles: start at 90 degrees (12 o'clock), negative spans clockwise
             start_angle = 90 * 16
             span_angle = -int(usage_pct * 360 * 16)
             painter.drawArc(rect, start_angle, span_angle)
@@ -100,7 +101,7 @@ class RadialGauge(QWidget):
         sub_font_size = max(6.5, radius * 0.16)
         sub_font = QFont("Segoe UI", int(sub_font_size), QFont.Weight.Bold)
         painter.setFont(sub_font)
-        painter.setPen(QColor(140, 140, 150))
+        painter.setPen(QColor(self.theme.text_secondary))
         sub_rect = QRectF(rect.left(), cy - radius * 0.65, rect.width(), radius * 0.35)
         painter.drawText(sub_rect, Qt.AlignmentFlag.AlignCenter, "REMAINING")
 
@@ -131,7 +132,7 @@ class RadialGauge(QWidget):
         elif payload.usage_percent > 0.75:
             used_color = QColor(OpenRouterTheme.AMBER_WARNING)
         else:
-            used_color = QColor(140, 140, 150)
+            used_color = QColor(self.theme.text_secondary)
 
         painter.setPen(used_color)
         used_rect = QRectF(rect.left(), cy + radius * 0.28, rect.width(), radius * 0.35)
@@ -145,7 +146,6 @@ class RadialGauge(QWidget):
         cy = rect.center().y()
         radius = rect.width() / 2.0
 
-        # Infinity Symbol / Key Spend
         inf_font = QFont("Segoe UI", int(max(14.0, radius * 0.45)), QFont.Weight.Bold)
         painter.setFont(inf_font)
         painter.setPen(QColor(OpenRouterTheme.NEON_VIOLET))
@@ -154,7 +154,7 @@ class RadialGauge(QWidget):
 
         sub_font = QFont("Segoe UI", int(max(6.5, radius * 0.16)), QFont.Weight.Bold)
         painter.setFont(sub_font)
-        painter.setPen(QColor(140, 140, 150))
+        painter.setPen(QColor(self.theme.text_secondary))
         sub_rect = QRectF(rect.left(), cy - radius * 0.2, rect.width(), radius * 0.25)
         painter.drawText(sub_rect, Qt.AlignmentFlag.AlignCenter, "KEY SPEND")
 
@@ -166,6 +166,6 @@ class RadialGauge(QWidget):
 
         tier_font = QFont("Segoe UI", int(max(6.0, radius * 0.14)))
         painter.setFont(tier_font)
-        painter.setPen(QColor(140, 140, 150))
+        painter.setPen(QColor(self.theme.text_secondary))
         tier_rect = QRectF(rect.left(), cy + radius * 0.45, rect.width(), radius * 0.25)
         painter.drawText(tier_rect, Qt.AlignmentFlag.AlignCenter, "Unlimited")

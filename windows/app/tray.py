@@ -8,10 +8,11 @@ from typing import Callable, Optional
 
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QAction, QColor, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import QMenu, QSystemTrayIcon, QWidget
+from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
 
 from windows.core.models import OpenRouterTheme
 from windows.core.storage import SharedStorage
+from windows.core.theme import ThemeManager
 
 
 def create_default_tray_icon() -> QIcon:
@@ -50,6 +51,8 @@ class SystemTrayManager(QObject):
         super().__init__(parent)
         self.main_window = main_window
         self.desktop_widget = desktop_widget
+        self.theme = ThemeManager.get_instance()
+        self.theme.theme_changed.connect(self._on_theme_changed)
 
         self.tray_icon = QSystemTrayIcon(create_default_tray_icon(), self)
         self.tray_icon.setToolTip("OpenRouter Tracker")
@@ -60,28 +63,36 @@ class SystemTrayManager(QObject):
 
     def _build_menu(self) -> None:
         menu = QMenu()
-        menu.setStyleSheet("""
-            QMenu {
-                background-color: #27272A;
-                color: #F4F4F5;
-                border: 1px solid #3F3F46;
+
+        is_dark = self.theme.is_dark()
+        menu_bg = "#27272A" if is_dark else "#FFFFFF"
+        menu_text = "#F4F4F5" if is_dark else "#0F172A"
+        menu_border = "#3F3F46" if is_dark else "#E2E8F0"
+        menu_sep = "#3F3F46" if is_dark else "#E2E8F0"
+
+        menu_style = f"""
+            QMenu {{
+                background-color: {menu_bg};
+                color: {menu_text};
+                border: 1px solid {menu_border};
                 border-radius: 8px;
                 padding: 4px;
-            }
-            QMenu::item {
+            }}
+            QMenu::item {{
                 padding: 6px 18px;
                 border-radius: 4px;
-            }
-            QMenu::item:selected {
+            }}
+            QMenu::item:selected {{
                 background-color: #3B82F6;
                 color: #FFFFFF;
-            }
-            QMenu::separator {
+            }}
+            QMenu::separator {{
                 height: 1px;
-                background-color: #3F3F46;
+                background-color: {menu_sep};
                 margin: 4px 6px;
-            }
-        """)
+            }}
+        """
+        menu.setStyleSheet(menu_style)
 
         # Toggle Companion Window
         act_toggle_app = menu.addAction("🖥️ Show Companion App")
@@ -97,7 +108,7 @@ class SystemTrayManager(QObject):
 
         # Widget Size Submenu
         size_menu = menu.addMenu("📐 Widget Size")
-        size_menu.setStyleSheet(menu.styleSheet())
+        size_menu.setStyleSheet(menu_style)
         act_small = size_menu.addAction("Small Widget (Square)")
         act_small.triggered.connect(lambda: self.desktop_widget.set_mode("small"))
         act_medium = size_menu.addAction("Medium Widget (Wide)")
@@ -109,11 +120,31 @@ class SystemTrayManager(QObject):
 
         menu.addSeparator()
 
+        # Theme Submenu
+        theme_menu = menu.addMenu("🎨 Theme")
+        theme_menu.setStyleSheet(menu_style)
+        act_sys = theme_menu.addAction("💻 System Default")
+        act_sys.setCheckable(True)
+        act_sys.setChecked(self.theme.mode == "system")
+        act_sys.triggered.connect(lambda: self.theme.set_mode("system"))
+
+        act_dark = theme_menu.addAction("🌙 Dark Mode")
+        act_dark.setCheckable(True)
+        act_dark.setChecked(self.theme.mode == "dark")
+        act_dark.triggered.connect(lambda: self.theme.set_mode("dark"))
+
+        act_light = theme_menu.addAction("☀️ Light Mode")
+        act_light.setCheckable(True)
+        act_light.setChecked(self.theme.mode == "light")
+        act_light.triggered.connect(lambda: self.theme.set_mode("light"))
+
+        menu.addSeparator()
+
         # Switch Active Key Submenu
         keys = SharedStorage.load_all_keys()
         if keys:
             key_menu = menu.addMenu("🔑 Active Key")
-            key_menu.setStyleSheet(menu.styleSheet())
+            key_menu.setStyleSheet(menu_style)
             for k in keys:
                 prefix = "✓ " if k.is_widget_key else "   "
                 act_k = key_menu.addAction(f"{prefix}{k.custom_label}")
@@ -131,10 +162,12 @@ class SystemTrayManager(QObject):
 
         # Exit
         act_exit = menu.addAction("🚪 Exit OpenRouter Tracker")
-        from PySide6.QtWidgets import QApplication
         act_exit.triggered.connect(QApplication.instance().quit)
 
         self.tray_icon.setContextMenu(menu)
+
+    def _on_theme_changed(self) -> None:
+        self._build_menu()
 
     def update_menu(self) -> None:
         self._build_menu()
