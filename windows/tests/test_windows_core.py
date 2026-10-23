@@ -217,6 +217,31 @@ class TestUIComponents(unittest.TestCase):
         self.assertEqual(len(win.keys), 1)
         self.assertEqual(win.keys[0].id, key.id)
 
+    def test_add_key_dialog_separate_buttons_and_signals(self):
+        from windows.app.add_key_dialog import AddKeyDialog
+        dlg = AddKeyDialog()
+
+        # Verify buttons are distinct
+        self.assertIsNotNone(dlg.btn_test)
+        self.assertIsNotNone(dlg.btn_save)
+        self.assertEqual(dlg.btn_test.text(), "Test Key")
+        self.assertEqual(dlg.btn_save.text(), "Save Key")
+        self.assertFalse(dlg.btn_test.isEnabled())
+        self.assertFalse(dlg.btn_save.isEnabled())
+
+        # Typing valid length key enables both buttons
+        dlg.txt_key.setText("sk-or-v1-sample-api-key-test")
+        self.assertTrue(dlg.btn_test.isEnabled())
+        self.assertTrue(dlg.btn_save.isEnabled())
+
+        # Test callback handles payload via Qt signals without getting stuck
+        mock_payload = WidgetPayload(total_balance=100.0, total_credits=100.0, total_usage=0.0)
+        dlg._on_test_finished(mock_payload)
+        self.assertFalse(dlg._is_testing)
+        self.assertEqual(dlg.btn_test.text(), "Test Key")
+        self.assertFalse(dlg.lbl_status.isHidden())
+        self.assertIn("Verified", dlg.lbl_status.text())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -184,6 +184,7 @@ class MainWindow(QMainWindow):
     """OpenRouter Tracker Windows Companion App."""
 
     data_updated = Signal()
+    _key_refreshed = Signal(str, object)  # Emits (key_id, payload)
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -198,6 +199,7 @@ class MainWindow(QMainWindow):
         self._is_editing_label: bool = False
 
         self._init_ui()
+        self._key_refreshed.connect(self._on_key_refresh_completed)
         self.load_all_data()
 
     def _init_ui(self) -> None:
@@ -737,18 +739,21 @@ class MainWindow(QMainWindow):
         self.btn_refresh.setText("⏳ Refreshing...")
 
         def worker():
-            payload = OpenRouterService.refresh_key(key)
-
-            from PySide6.QtCore import QTimer
-            def on_done():
-                self._is_refreshing = False
-                self.btn_refresh.setEnabled(True)
-                self.btn_refresh.setText("🔄 Refresh")
-                self.payloads[key.id] = payload
-                self._render_payload(payload)
-                self.data_updated.emit()
-
-            QTimer.singleShot(0, on_done)
+            try:
+                payload = OpenRouterService.refresh_key(key)
+            except Exception as e:
+                payload = WidgetPayload.empty()
+                payload.error_message = str(e)
+            self._key_refreshed.emit(key.id, payload)
 
         t = threading.Thread(target=worker, daemon=True)
         t.start()
+
+    def _on_key_refresh_completed(self, key_id: str, payload: WidgetPayload) -> None:
+        self._is_refreshing = False
+        self.btn_refresh.setEnabled(True)
+        self.btn_refresh.setText("🔄 Refresh")
+        self.payloads[key_id] = payload
+        if self.selected_key_id == key_id:
+            self._render_payload(payload)
+        self.data_updated.emit()
