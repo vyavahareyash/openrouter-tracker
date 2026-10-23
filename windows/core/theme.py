@@ -6,7 +6,7 @@ import winreg
 from typing import Optional
 
 from PySide6.QtCore import QObject, Qt, Signal
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QApplication
 
 from windows.core.models import OpenRouterTheme
@@ -27,6 +27,7 @@ class ThemeManager(QObject):
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._mode = SharedStorage.get_setting("theme_mode", "system")
+        self._apply_app_palette()
 
     @property
     def mode(self) -> str:
@@ -37,12 +38,14 @@ class ThemeManager(QObject):
             return
         self._mode = mode
         SharedStorage.set_setting("theme_mode", mode)
+        self._apply_app_palette()
         self.theme_changed.emit()
 
     def sync_from_storage(self) -> bool:
         disk_mode = SharedStorage.get_setting("theme_mode", "system")
         if disk_mode != self._mode:
             self._mode = disk_mode
+            self._apply_app_palette()
             self.theme_changed.emit()
             return True
         return False
@@ -69,6 +72,43 @@ class ThemeManager(QObject):
         if app and hasattr(app, "styleHints"):
             return app.styleHints().colorScheme() == Qt.ColorScheme.Dark
         return True
+
+    def _apply_app_palette(self) -> None:
+        app = QApplication.instance()
+        if not app:
+            return
+
+        is_dark = self.is_dark()
+        palette = QPalette()
+        if is_dark:
+            palette.setColor(QPalette.ColorRole.Window, QColor("#18181B"))
+            palette.setColor(QPalette.ColorRole.WindowText, QColor("#F4F4F5"))
+            palette.setColor(QPalette.ColorRole.Base, QColor("#202024"))
+            palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#27272A"))
+            palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#27272A"))
+            palette.setColor(QPalette.ColorRole.ToolTipText, QColor("#F4F4F5"))
+            palette.setColor(QPalette.ColorRole.Text, QColor("#F4F4F5"))
+            palette.setColor(QPalette.ColorRole.Button, QColor("#27272A"))
+            palette.setColor(QPalette.ColorRole.ButtonText, QColor("#F4F4F5"))
+            palette.setColor(QPalette.ColorRole.BrightText, QColor("#EF4444"))
+            palette.setColor(QPalette.ColorRole.Link, QColor("#3B82F6"))
+            palette.setColor(QPalette.ColorRole.Highlight, QColor("#3B82F6"))
+            palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#FFFFFF"))
+        else:
+            palette.setColor(QPalette.ColorRole.Window, QColor("#F8FAFC"))
+            palette.setColor(QPalette.ColorRole.WindowText, QColor("#0F172A"))
+            palette.setColor(QPalette.ColorRole.Base, QColor("#FFFFFF"))
+            palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#F1F5F9"))
+            palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#FFFFFF"))
+            palette.setColor(QPalette.ColorRole.ToolTipText, QColor("#0F172A"))
+            palette.setColor(QPalette.ColorRole.Text, QColor("#0F172A"))
+            palette.setColor(QPalette.ColorRole.Button, QColor("#FFFFFF"))
+            palette.setColor(QPalette.ColorRole.ButtonText, QColor("#0F172A"))
+            palette.setColor(QPalette.ColorRole.BrightText, QColor("#EF4444"))
+            palette.setColor(QPalette.ColorRole.Link, QColor("#3B82F6"))
+            palette.setColor(QPalette.ColorRole.Highlight, QColor("#3B82F6"))
+            palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#FFFFFF"))
+        app.setPalette(palette)
 
     # MARK: - Semantic Colors
 

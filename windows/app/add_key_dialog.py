@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
 from windows.core.models import OpenRouterTheme, TrackedKey, WidgetPayload
 from windows.core.service import OpenRouterService
 from windows.core.storage import SharedStorage
+from windows.core.theme import ThemeManager
 
 
 class AddKeyDialog(QDialog):
@@ -36,92 +37,39 @@ class AddKeyDialog(QDialog):
         self._verified_payload: Optional[WidgetPayload] = None
         self._verified_key_str: Optional[str] = None
 
+        self.theme = ThemeManager.get_instance()
+        self.theme.theme_changed.connect(self.apply_theme)
+
         self._init_ui()
         self._test_finished.connect(self._on_test_finished)
         self._save_finished.connect(self._on_save_finished)
+        self.apply_theme()
 
     def _init_ui(self) -> None:
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #1E1E24;
-                color: #F4F4F5;
-            }
-            QLabel {
-                color: #E4E4E7;
-            }
-            QLineEdit {
-                background-color: #27272A;
-                color: #FFFFFF;
-                border: 1px solid #3F3F46;
-                border-radius: 6px;
-                padding: 8px 10px;
-                font-size: 13px;
-            }
-            QLineEdit:focus {
-                border: 1px solid #3B82F6;
-            }
-            QCheckBox {
-                color: #D4D4D8;
-                spacing: 8px;
-            }
-            QPushButton {
-                background-color: #27272A;
-                color: #F4F4F5;
-                border: 1px solid #3F3F46;
-                border-radius: 6px;
-                padding: 8px 16px;
-                font-weight: 600;
-            }
-            QPushButton:hover {
-                background-color: #3F3F46;
-            }
-            QPushButton#testBtn {
-                background-color: #27272A;
-                color: #38BDF8;
-                border: 1px solid rgba(56, 189, 248, 0.4);
-            }
-            QPushButton#testBtn:hover {
-                background-color: rgba(56, 189, 248, 0.15);
-            }
-            QPushButton#saveBtn {
-                background-color: #3B82F6;
-                color: #FFFFFF;
-                border: none;
-            }
-            QPushButton#saveBtn:hover {
-                background-color: #2563EB;
-            }
-            QPushButton#saveBtn:disabled, QPushButton#testBtn:disabled {
-                background-color: #27272A;
-                color: #55555C;
-                border-color: #3F3F46;
-            }
-        """)
-
         layout = QVBoxLayout(self)
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(16)
 
-        title = QLabel("Add New OpenRouter Key")
-        title.setStyleSheet("font-size: 17px; font-weight: bold; color: #FFFFFF;")
-        layout.addWidget(title)
+        self.title_lbl = QLabel("Add New OpenRouter Key")
+        self.title_lbl.setStyleSheet("font-size: 17px; font-weight: bold;")
+        layout.addWidget(self.title_lbl)
 
         # Custom Nickname Input
-        lbl_nick = QLabel("Custom Nickname")
-        lbl_nick.setStyleSheet("font-size: 11px; font-weight: bold; color: #A1A1AA;")
+        self.lbl_nick = QLabel("Custom Nickname")
+        self.lbl_nick.setStyleSheet("font-size: 11px; font-weight: bold;")
         self.txt_nickname = QLineEdit()
         self.txt_nickname.setPlaceholderText("e.g. Work Backend, Personal Project")
-        layout.addWidget(lbl_nick)
+        layout.addWidget(self.lbl_nick)
         layout.addWidget(self.txt_nickname)
 
         # API Key Input
-        lbl_key = QLabel("API Key")
-        lbl_key.setStyleSheet("font-size: 11px; font-weight: bold; color: #A1A1AA;")
+        self.lbl_key = QLabel("API Key")
+        self.lbl_key.setStyleSheet("font-size: 11px; font-weight: bold;")
         self.txt_key = QLineEdit()
         self.txt_key.setEchoMode(QLineEdit.EchoMode.Password)
         self.txt_key.setPlaceholderText("sk-or-v1-...")
         self.txt_key.textChanged.connect(self._on_key_text_changed)
-        layout.addWidget(lbl_key)
+        layout.addWidget(self.lbl_key)
         layout.addWidget(self.txt_key)
 
         # Pin to widget checkbox
@@ -158,6 +106,80 @@ class AddKeyDialog(QDialog):
         btn_layout.addWidget(self.btn_save)
 
         layout.addLayout(btn_layout)
+
+    def apply_theme(self) -> None:
+        is_dark = self.theme.is_dark()
+        bg = "#1E1E24" if is_dark else "#FFFFFF"
+        text = "#F4F4F5" if is_dark else "#0F172A"
+        sec = "#A1A1AA" if is_dark else "#64748B"
+        input_bg = "#27272A" if is_dark else "#F8FAFC"
+        input_border = "#3F3F46" if is_dark else "#CBD5E1"
+        btn_bg = "#27272A" if is_dark else "#F1F5F9"
+        btn_border = "#3F3F46" if is_dark else "#CBD5E1"
+
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {bg};
+                color: {text};
+            }}
+            QLabel {{
+                color: {text};
+            }}
+            QLineEdit {{
+                background-color: {input_bg};
+                color: {text};
+                border: 1px solid {input_border};
+                border-radius: 6px;
+                padding: 8px 10px;
+                font-size: 13px;
+            }}
+            QLineEdit:focus {{
+                border: 1px solid #3B82F6;
+            }}
+            QCheckBox {{
+                color: {text};
+                spacing: 8px;
+            }}
+            QPushButton {{
+                background-color: {btn_bg};
+                color: {text};
+                border: 1px solid {btn_border};
+                border-radius: 6px;
+                padding: 8px 16px;
+                font-weight: 600;
+            }}
+            QPushButton:hover {{
+                background-color: {'#3F3F46' if is_dark else '#E2E8F0'};
+            }}
+            QPushButton#testBtn {{
+                background-color: {btn_bg};
+                color: #38BDF8;
+                border: 1px solid rgba(56, 189, 248, 0.4);
+            }}
+            QPushButton#testBtn:hover {{
+                background-color: rgba(56, 189, 248, 0.15);
+            }}
+            QPushButton#saveBtn {{
+                background-color: #3B82F6;
+                color: #FFFFFF;
+                border: none;
+            }}
+            QPushButton#saveBtn:hover {{
+                background-color: #2563EB;
+            }}
+            QPushButton#saveBtn:disabled, QPushButton#testBtn:disabled {{
+                background-color: {btn_bg};
+                color: {'#55555C' if is_dark else '#94A3B8'};
+                border-color: {btn_border};
+            }}
+        """)
+
+        if hasattr(self, "title_lbl"):
+            self.title_lbl.setStyleSheet(f"font-size: 17px; font-weight: bold; color: {text};")
+        if hasattr(self, "lbl_nick"):
+            self.lbl_nick.setStyleSheet(f"font-size: 11px; font-weight: bold; color: {sec};")
+        if hasattr(self, "lbl_key"):
+            self.lbl_key.setStyleSheet(f"font-size: 11px; font-weight: bold; color: {sec};")
 
     def _on_key_text_changed(self) -> None:
         key_text = self.txt_key.text().strip()

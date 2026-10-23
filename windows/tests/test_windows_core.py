@@ -295,6 +295,52 @@ class TestUIComponents(unittest.TestCase):
         # Reset theme
         theme.set_mode("system")
 
+    def test_main_window_dark_and_light_theming_and_key_name_visibility(self):
+        from windows.app.main_window import MainWindow
+        from windows.core.theme import ThemeManager
+
+        theme = ThemeManager.get_instance()
+        key = SharedStorage.add_key("Visible Key", "sk-or-v1-visible-key-test-12345678", is_widget_key=True)
+        win = MainWindow()
+
+        # 1. Dark Mode
+        theme.set_mode("dark")
+        self.assertTrue(theme.is_dark())
+        self.assertEqual(win.lbl_key_name.text(), "Visible Key")
+        self.assertIn("#F4F4F5", win.lbl_key_name.styleSheet())
+        self.assertIn("#18181B", win.detail_container.styleSheet())
+        self.assertIn("#18181B", win.scroll.viewport().styleSheet())
+        self.assertIn("#F4F4F5", win.lbl_budget_title.styleSheet())
+
+        # 2. Light Mode
+        theme.set_mode("light")
+        self.assertFalse(theme.is_dark())
+        self.assertEqual(win.lbl_key_name.text(), "Visible Key")
+        self.assertIn("#0F172A", win.lbl_key_name.styleSheet())
+        self.assertIn("#F8FAFC", win.detail_container.styleSheet())
+        self.assertIn("#F8FAFC", win.scroll.viewport().styleSheet())
+        self.assertIn("#0F172A", win.lbl_budget_title.styleSheet())
+
+        # 3. Cycle Theme from Light to Dark
+        win._cycle_theme()
+        self.assertEqual(theme.mode, "dark")
+        self.assertIn("#F4F4F5", win.lbl_key_name.styleSheet())
+        self.assertIn("#18181B", win.detail_container.styleSheet())
+
+        # Reset
+        theme.set_mode("system")
+
+    def test_account_burn_bar(self):
+        from windows.app.main_window import AccountBurnBar
+        bar = AccountBurnBar()
+        bar.set_percent(0.42)
+        self.assertAlmostEqual(bar.burn_pct, 0.42)
+        # Test clamping
+        bar.set_percent(1.5)
+        self.assertAlmostEqual(bar.burn_pct, 1.0)
+        bar.set_percent(-0.2)
+        self.assertAlmostEqual(bar.burn_pct, 0.0)
+
 
 class TestThemeManager(unittest.TestCase):
     def setUp(self):

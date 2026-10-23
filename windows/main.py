@@ -30,6 +30,10 @@ def main() -> int:
     app_icon = create_default_tray_icon()
     app.setWindowIcon(app_icon)
 
+    # Initialize theme and apply application palette early
+    from windows.core.theme import ThemeManager
+    ThemeManager.get_instance()
+
     # Initialize components
     main_window = MainWindow()
     desktop_widget = DesktopWidget()
