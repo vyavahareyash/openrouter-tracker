@@ -242,6 +242,37 @@ class TestUIComponents(unittest.TestCase):
         self.assertFalse(dlg.lbl_status.isHidden())
         self.assertIn("Verified", dlg.lbl_status.text())
 
+    def test_key_list_item_widget_theming_and_selection(self):
+        from windows.app.main_window import KeyListItemWidget
+        from windows.core.theme import ThemeManager
+
+        key = TrackedKey(id="k1", key_masked="sk-or-v1...459f", custom_label="FDE Key", is_widget_key=True)
+        payload = WidgetPayload(key_usage=4.15, key_limit=5.0, key_remaining=0.85, total_balance=100.0, total_credits=100.0, total_usage=0.0)
+
+        theme = ThemeManager.get_instance()
+        theme.set_mode("light")
+
+        widget = KeyListItemWidget(key, payload)
+        self.assertFalse(widget.is_selected)
+        self.assertIn("transparent", widget.styleSheet())
+        self.assertIn("#0F172A", widget.lbl_name.styleSheet())
+
+        # Select the item
+        widget.set_selected(True)
+        self.assertTrue(widget.is_selected)
+        self.assertIn("#3B82F6", widget.styleSheet())
+        self.assertIn("#FFFFFF", widget.lbl_name.styleSheet())
+        self.assertIn("transparent", widget.lbl_name.styleSheet())
+
+        # Switch to dark mode
+        theme.set_mode("dark")
+        widget.set_selected(False)
+        self.assertFalse(widget.is_selected)
+        self.assertIn("#F4F4F5", widget.lbl_name.styleSheet())
+
+        # Reset theme
+        theme.set_mode("system")
+
 
 class TestThemeManager(unittest.TestCase):
     def setUp(self):

@@ -43,7 +43,7 @@ from windows.core.theme import ThemeManager
 from windows.widget.radial_gauge import RadialGauge
 
 
-class KeyListItemWidget(QWidget):
+class KeyListItemWidget(QFrame):
     """Custom sidebar item widget with status dot, title, token, and percent pill."""
 
     def __init__(
@@ -56,6 +56,8 @@ class KeyListItemWidget(QWidget):
         self.key = key
         self.payload = payload
         self.theme = ThemeManager.get_instance()
+        self.is_selected: bool = False
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self._init_ui()
 
     def _init_ui(self) -> None:
@@ -64,9 +66,7 @@ class KeyListItemWidget(QWidget):
         layout.setSpacing(10)
 
         # Dot
-        dot_color = OpenRouterTheme.ELECTRIC_BLUE if self.key.is_widget_key else self.theme.text_muted
         self.dot = QLabel("●")
-        self.dot.setStyleSheet(f"color: {dot_color}; font-size: 9px;")
         layout.addWidget(self.dot)
 
         # Text labels
@@ -76,21 +76,18 @@ class KeyListItemWidget(QWidget):
 
         name_row = QHBoxLayout()
         name_row.setSpacing(4)
-        lbl_name = QLabel(self.key.custom_label)
-        lbl_name.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 13px; font-weight: 600;")
-        name_row.addWidget(lbl_name)
+        self.lbl_name = QLabel(self.key.custom_label)
+        name_row.addWidget(self.lbl_name)
 
         if self.key.is_widget_key:
-            badge = QLabel("📌")
-            badge.setStyleSheet("font-size: 10px;")
-            name_row.addWidget(badge)
+            self.badge = QLabel("📌")
+            name_row.addWidget(self.badge)
 
         name_row.addStretch()
         text_vbox.addLayout(name_row)
 
-        lbl_token = QLabel(self.key.key_masked)
-        lbl_token.setStyleSheet(f"color: {self.theme.text_muted}; font-family: Consolas, monospace; font-size: 10px;")
-        text_vbox.addWidget(lbl_token)
+        self.lbl_token = QLabel(self.key.key_masked)
+        text_vbox.addWidget(self.lbl_token)
 
         layout.addLayout(text_vbox, stretch=1)
 
@@ -98,20 +95,87 @@ class KeyListItemWidget(QWidget):
         if self.payload and self.payload.key_limit and self.payload.key_limit > 0:
             pct = self.payload.usage_percent
             pct_int = int(pct * 100)
-            pill_color = OpenRouterTheme.get_gauge_color(pct)
-            bg_col = "rgba(255, 255, 255, 0.08)" if self.theme.is_dark() else "rgba(0, 0, 0, 0.05)"
-            pill = QLabel(f"{pct_int}%")
-            pill.setStyleSheet(f"""
-                QLabel {{
-                    background-color: {bg_col};
-                    color: {pill_color};
-                    font-size: 11px;
-                    font-weight: bold;
-                    border-radius: 4px;
-                    padding: 2px 6px;
+            self.pill = QLabel(f"{pct_int}%")
+            layout.addWidget(self.pill)
+
+        self.apply_theme()
+
+    def set_selected(self, selected: bool) -> None:
+        self.is_selected = selected
+        self.apply_theme()
+
+    def apply_theme(self) -> None:
+        is_dark = self.theme.is_dark()
+        if self.is_selected:
+            self.setStyleSheet("""
+                KeyListItemWidget {
+                    background-color: #3B82F6;
+                    border-radius: 8px;
+                    border: none;
+                }
+            """)
+            dot_color = "#FFFFFF" if self.key.is_widget_key else "rgba(255, 255, 255, 0.55)"
+            self.dot.setStyleSheet(f"color: {dot_color}; font-size: 9px; background: transparent; border: none;")
+            self.lbl_name.setStyleSheet("color: #FFFFFF; font-size: 13px; font-weight: 600; background: transparent; border: none;")
+            if hasattr(self, "badge"):
+                self.badge.setStyleSheet("font-size: 10px; background: transparent; border: none;")
+            self.lbl_token.setStyleSheet("color: rgba(255, 255, 255, 0.85); font-family: Consolas, monospace; font-size: 10px; background: transparent; border: none;")
+            if hasattr(self, "pill"):
+                self.pill.setStyleSheet("""
+                    QLabel {
+                        background-color: rgba(255, 255, 255, 0.22);
+                        color: #FFFFFF;
+                        font-size: 11px;
+                        font-weight: bold;
+                        border-radius: 4px;
+                        padding: 2px 6px;
+                        border: none;
+                    }
+                """)
+        else:
+            hover_bg = "rgba(255, 255, 255, 0.06)" if is_dark else "rgba(0, 0, 0, 0.05)"
+            self.setStyleSheet(f"""
+                KeyListItemWidget {{
+                    background-color: transparent;
+                    border-radius: 8px;
+                    border: none;
+                }}
+                KeyListItemWidget:hover {{
+                    background-color: {hover_bg};
                 }}
             """)
-            layout.addWidget(pill)
+            dot_color = OpenRouterTheme.ELECTRIC_BLUE if self.key.is_widget_key else self.theme.text_muted
+            self.dot.setStyleSheet(f"color: {dot_color}; font-size: 9px; background: transparent; border: none;")
+            self.lbl_name.setStyleSheet(f"color: {self.theme.text_primary}; font-size: 13px; font-weight: 600; background: transparent; border: none;")
+            if hasattr(self, "badge"):
+                self.badge.setStyleSheet("font-size: 10px; background: transparent; border: none;")
+            self.lbl_token.setStyleSheet(f"color: {self.theme.text_secondary}; font-family: Consolas, monospace; font-size: 10px; background: transparent; border: none;")
+            if hasattr(self, "pill") and self.payload and self.payload.key_limit and self.payload.key_limit > 0:
+                pct = self.payload.usage_percent
+                pill_color = OpenRouterTheme.get_gauge_color(pct)
+                bg_col = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.05)"
+                self.pill.setStyleSheet(f"""
+                    QLabel {{
+                        background-color: {bg_col};
+                        color: {pill_color};
+                        font-size: 11px;
+                        font-weight: bold;
+                        border-radius: 4px;
+                        padding: 2px 6px;
+                        border: none;
+                    }}
+                """)
+
+    def mousePressEvent(self, event) -> None:
+        super().mousePressEvent(event)
+        p = self.parent()
+        while p and not isinstance(p, QListWidget):
+            p = p.parent()
+        if isinstance(p, QListWidget):
+            for i in range(p.count()):
+                if p.itemWidget(p.item(i)) is self:
+                    p.setCurrentRow(i)
+                    break
 
 
 class StatCard(QWidget):
@@ -228,6 +292,7 @@ class MainWindow(QMainWindow):
 
         # 1. Left Sidebar
         self.sidebar = QWidget()
+        self.sidebar.setObjectName("sidebar")
         self.sidebar.setFixedWidth(270)
         sidebar_layout = QVBoxLayout(self.sidebar)
         sidebar_layout.setContentsMargins(12, 16, 12, 16)
@@ -237,6 +302,7 @@ class MainWindow(QMainWindow):
         sidebar_layout.addWidget(self.lbl_section)
 
         self.list_keys = QListWidget()
+        self.list_keys.setObjectName("list_keys")
         self.list_keys.currentRowChanged.connect(self._on_key_selected)
         sidebar_layout.addWidget(self.list_keys, stretch=1)
 
@@ -272,21 +338,29 @@ class MainWindow(QMainWindow):
                 background-color: {sb_border};
                 width: 1px;
             }}
-            QListWidget {{
+            QWidget#sidebar {{
                 background-color: {sb_bg};
+                border-right: 1px solid {sb_border};
+            }}
+            QListWidget#list_keys {{
+                background-color: transparent;
                 border: none;
                 outline: none;
             }}
-            QListWidget::item {{
+            QListWidget#list_keys::item {{
+                background-color: transparent;
+                border: none;
+                padding: 0px;
+                margin: 2px 4px;
                 border-radius: 8px;
-                margin: 2px 8px;
             }}
-            QListWidget::item:selected {{
-                background-color: #3B82F6;
-                color: #FFFFFF;
+            QListWidget#list_keys::item:selected {{
+                background-color: transparent;
+                border: none;
             }}
-            QListWidget::item:hover:!selected {{
-                background-color: {'#27272A' if is_dark else '#E2E8F0'};
+            QListWidget#list_keys::item:hover:!selected {{
+                background-color: transparent;
+                border: none;
             }}
             QScrollArea {{
                 background-color: {bg};
@@ -305,8 +379,14 @@ class MainWindow(QMainWindow):
             }}
         """)
 
-        self.sidebar.setStyleSheet(f"background-color: {sb_bg}; border-right: 1px solid {sb_border};")
-        self.lbl_section.setStyleSheet(f"color: {muted}; font-size: 11px; font-weight: bold; letter-spacing: 0.5px;")
+        self.lbl_section.setStyleSheet(f"color: {muted}; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; background: transparent; border: none;")
+
+        # Update all list item widgets to match current theme
+        for i in range(self.list_keys.count()):
+            item = self.list_keys.item(i)
+            w = self.list_keys.itemWidget(item)
+            if isinstance(w, KeyListItemWidget):
+                w.apply_theme()
 
         self.btn_add.setStyleSheet("""
             QPushButton {
@@ -652,12 +732,31 @@ class MainWindow(QMainWindow):
             self.selected_key_id = None
         else:
             self.detail_stack.setCurrentIndex(1)
-            widget_idx = next((i for i, k in enumerate(self.keys) if k.is_widget_key), 0)
-            self.list_keys.setCurrentRow(widget_idx)
+            sel_idx = 0
+            if self.selected_key_id:
+                match_idx = next((i for i, k in enumerate(self.keys) if k.id == self.selected_key_id), -1)
+                if match_idx >= 0:
+                    sel_idx = match_idx
+                else:
+                    sel_idx = next((i for i, k in enumerate(self.keys) if k.is_widget_key), 0)
+            else:
+                sel_idx = next((i for i, k in enumerate(self.keys) if k.is_widget_key), 0)
+
+            self.list_keys.setCurrentRow(sel_idx)
+            for i in range(self.list_keys.count()):
+                w = self.list_keys.itemWidget(self.list_keys.item(i))
+                if isinstance(w, KeyListItemWidget):
+                    w.set_selected(i == sel_idx)
 
     def _on_key_selected(self, row: int) -> None:
         if row < 0 or row >= len(self.keys):
             return
+
+        for i in range(self.list_keys.count()):
+            w = self.list_keys.itemWidget(self.list_keys.item(i))
+            if isinstance(w, KeyListItemWidget):
+                w.set_selected(i == row)
+
         key = self.keys[row]
         self.selected_key_id = key.id
         self._display_key(key)
